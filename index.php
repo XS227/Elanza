@@ -74,7 +74,7 @@ $businessDefaults = [
         'lat' => (float) (getenv('BUSINESS_LATITUDE') ?: '35.715298'),
         'lng' => (float) (getenv('BUSINESS_LONGITUDE') ?: '51.404343'),
     ],
-    'bookingUrl' => getenv('BOOKING_URL') ?: 'https://calendar.google.com',
+    'bookingUrl' => getenv('BOOKING_URL') ?: '',
     'mapEmbed' => getenv('CONTACT_MAP_EMBED') ?: '',
 ];
 
@@ -85,6 +85,9 @@ $cacheTtl = (int) (getenv('CACHE_TTL_SECONDS') ?: 43200); // 12 hours by default
 $placeDetails = fetchGooglePlaceDetails($placesApiKey, $placeId, $cacheTtl);
 
 $business = enrichBusinessData($businessDefaults, $placeDetails, $placesApiKey);
+$business['bookingUrl'] = buildBookingLink($business['bookingUrl'] ?? '', $business['phone'] ?? '');
+$bookingLinkIsTel = str_starts_with($business['bookingUrl'], 'tel:');
+$callLink = buildTelLink($business['phone'] ?? '');
 
 [$formStatus, $formErrors] = handleContactForm($business['email']);
 
@@ -417,7 +420,7 @@ $structuredData = buildStructuredData($business);
                 <li class="nav-item"><a class="nav-link" href="#contact">تماس</a></li>
                 <li class="nav-item"><a class="nav-link" href="#map">مسیر</a></li>
             </ul>
-            <a class="btn btn-primary rounded-pill ms-lg-3" href="<?= htmlspecialchars($business['bookingUrl'], ENT_QUOTES, 'UTF-8'); ?>" target="_blank" rel="noopener">رزرو آنلاین</a>
+            <a class="btn btn-primary rounded-pill ms-lg-3" href="<?= htmlspecialchars($business['bookingUrl'], ENT_QUOTES, 'UTF-8'); ?>" <?= $bookingLinkIsTel ? '' : 'target="_blank" rel="noopener"'; ?>>رزرو آنلاین</a>
         </div>
     </div>
 </nav>
@@ -430,10 +433,10 @@ $structuredData = buildStructuredData($business);
                 <h1 class="display-5 mb-3">تحول لبخند با دقت و آرامش در کلینیک الَنزا</h1>
                 <p class="lead mb-4">از معاینه‌های دوره‌ای تا درمان‌های زیبایی پیشرفته، تیم متخصص الَنزا در کنار خانوادهٔ شماست تا لبخندی سالم و درخشان بسازید.</p>
                 <div class="hero-actions">
-                    <a class="btn btn-primary btn-lg" href="<?= htmlspecialchars($business['bookingUrl'], ENT_QUOTES, 'UTF-8'); ?>" target="_blank" rel="noopener">
+                    <a class="btn btn-primary btn-lg" href="<?= htmlspecialchars($business['bookingUrl'], ENT_QUOTES, 'UTF-8'); ?>" <?= $bookingLinkIsTel ? '' : 'target="_blank" rel="noopener"'; ?>>
                         <i class="fa-solid fa-calendar-check ms-2"></i> رزرو وقت آنلاین
                     </a>
-                    <a class="btn btn-outline-primary btn-lg" href="tel:<?= htmlspecialchars(preg_replace('/\s+/', '', $business['phone']), ENT_QUOTES, 'UTF-8'); ?>">
+                    <a class="btn btn-outline-primary btn-lg" href="<?= htmlspecialchars($callLink, ENT_QUOTES, 'UTF-8'); ?>">
                         <i class="fa-solid fa-phone ms-2"></i> مشاوره فوری
                     </a>
                 </div>
@@ -624,7 +627,7 @@ $structuredData = buildStructuredData($business);
                 <div class="contact-card p-4 bg-white">
                     <h3 class="h5 mb-3"><i class="fa-solid fa-info-circle ms-2 text-primary"></i>راه‌های ارتباطی</h3>
                     <p class="mb-2"><i class="fa-solid fa-location-dot text-danger ms-2"></i><?= htmlspecialchars(formatAddress($business['address']), ENT_QUOTES, 'UTF-8'); ?></p>
-                    <p class="mb-2"><i class="fa-solid fa-phone text-success ms-2"></i><a href="tel:<?= htmlspecialchars(preg_replace('/\s+/', '', $business['phone']), ENT_QUOTES, 'UTF-8'); ?>" class="link-dark text-decoration-none"><?= htmlspecialchars($business['phone'], ENT_QUOTES, 'UTF-8'); ?></a></p>
+                    <p class="mb-2"><i class="fa-solid fa-phone text-success ms-2"></i><a href="<?= htmlspecialchars($callLink, ENT_QUOTES, 'UTF-8'); ?>" class="link-dark text-decoration-none"><?= htmlspecialchars($business['phone'], ENT_QUOTES, 'UTF-8'); ?></a></p>
                     <p class="mb-2"><i class="fa-solid fa-envelope text-warning ms-2"></i><a href="mailto:<?= htmlspecialchars($business['email'], ENT_QUOTES, 'UTF-8'); ?>" class="link-dark text-decoration-none"><?= htmlspecialchars($business['email'], ENT_QUOTES, 'UTF-8'); ?></a></p>
                     <p class="mb-0"><i class="fa-solid fa-earth-americas text-info ms-2"></i><a href="<?= htmlspecialchars($business['website'], ENT_QUOTES, 'UTF-8'); ?>" class="link-dark text-decoration-none" target="_blank" rel="noopener">وب‌سایت</a></p>
                 </div>
@@ -689,7 +692,7 @@ $structuredData = buildStructuredData($business);
     <div class="container text-center">
         <div class="mb-2">
             <a href="<?= htmlspecialchars($business['googleUrl'], ENT_QUOTES, 'UTF-8'); ?>" target="_blank" rel="noopener" class="btn btn-outline-light btn-sm rounded-pill"><i class="fa-brands fa-google ms-1"></i>صفحهٔ گوگل</a>
-            <a href="<?= htmlspecialchars($business['bookingUrl'], ENT_QUOTES, 'UTF-8'); ?>" target="_blank" rel="noopener" class="btn btn-primary btn-sm rounded-pill ms-2">رزرو آنلاین</a>
+            <a href="<?= htmlspecialchars($business['bookingUrl'], ENT_QUOTES, 'UTF-8'); ?>" <?= $bookingLinkIsTel ? '' : 'target="_blank" rel="noopener"'; ?> class="btn btn-primary btn-sm rounded-pill ms-2">رزرو آنلاین</a>
         </div>
         <p class="mb-0">© <?= date('Y'); ?> <?= htmlspecialchars($business['name'], ENT_QUOTES, 'UTF-8'); ?> - تمامی حقوق محفوظ است.</p>
     </div>
@@ -699,6 +702,44 @@ $structuredData = buildStructuredData($business);
 </body>
 </html>
 <?php
+function buildTelLink(?string $phone): string
+{
+    $phone = trim((string) $phone);
+    if ($phone === '') {
+        return '#';
+    }
+
+    if (str_starts_with($phone, 'tel:')) {
+        $phone = substr($phone, 4) ?: '';
+    }
+
+    $hasPlus = str_starts_with($phone, '+');
+    $digits = preg_replace('/\D+/u', '', $phone);
+    if (!is_string($digits) || $digits === '') {
+        return '#';
+    }
+
+    if ($hasPlus) {
+        $digits = '+' . ltrim($digits, '+');
+    }
+
+    return 'tel:' . $digits;
+}
+
+function buildBookingLink(?string $bookingUrl, ?string $phone): string
+{
+    $bookingUrl = trim((string) $bookingUrl);
+    if ($bookingUrl !== '') {
+        if (str_starts_with($bookingUrl, 'tel:')) {
+            return buildTelLink(substr($bookingUrl, 4) ?: '');
+        }
+
+        return $bookingUrl;
+    }
+
+    return buildTelLink($phone);
+}
+
 function fetchGooglePlaceDetails(string $apiKey, string $placeId, int $cacheTtl): ?array
 {
     if ($apiKey === '' || $placeId === '') {
@@ -881,7 +922,7 @@ function getDefaultServices(): array
         [
             'title' => 'زیبایی و اصلاح طرح لبخند',
             'description' => 'تکنیک‌های تخصصی برای درخشندگی و هماهنگی لبخند.',
-            'icon' => 'fa-solid fa-sparkles',
+            'icon' => 'fa-solid fa-wand-magic-sparkles',
             'items' => [
                 'کامپوزیت و ونیر کامپوزیت',
                 'لیفت لثه',
