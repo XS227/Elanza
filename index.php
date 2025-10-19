@@ -624,9 +624,7 @@ $structuredData = buildStructuredData($business);
                 <div class="contact-card p-4 bg-white">
                     <h3 class="h5 mb-3"><i class="fa-solid fa-info-circle ms-2 text-primary"></i>راه‌های ارتباطی</h3>
                     <p class="mb-2"><i class="fa-solid fa-location-dot text-danger ms-2"></i><?= htmlspecialchars(formatAddress($business['address']), ENT_QUOTES, 'UTF-8'); ?></p>
-                    <p class="mb-2"><i class="fa-solid fa-phone text-success ms-2"></i><a href="tel:<?= htmlspecialchars(preg_replace('/\s+/', '', $business['phone']), ENT_QUOTES, 'UTF-8'); ?>" class="link-dark text-decoration-none"><?= htmlspecialchars($business['phone'], ENT_QUOTES, 'UTF-8'); ?></a></p>
-                    <p class="mb-2"><i class="fa-solid fa-envelope text-warning ms-2"></i><a href="mailto:<?= htmlspecialchars($business['email'], ENT_QUOTES, 'UTF-8'); ?>" class="link-dark text-decoration-none"><?= htmlspecialchars($business['email'], ENT_QUOTES, 'UTF-8'); ?></a></p>
-                    <p class="mb-0"><i class="fa-solid fa-earth-americas text-info ms-2"></i><a href="<?= htmlspecialchars($business['website'], ENT_QUOTES, 'UTF-8'); ?>" class="link-dark text-decoration-none" target="_blank" rel="noopener">وب‌سایت</a></p>
+                    <p class="mb-0"><i class="fa-solid fa-phone text-success ms-2"></i><a href="tel:<?= htmlspecialchars(preg_replace('/\s+/', '', $business['phone']), ENT_QUOTES, 'UTF-8'); ?>" class="link-dark text-decoration-none"><?= htmlspecialchars(formatPhoneDisplay($business['phone']), ENT_QUOTES, 'UTF-8'); ?></a></p>
                 </div>
             </div>
             <div class="col-lg-6">
@@ -1078,19 +1076,49 @@ function renderStars(float $rating): string
 
 function formatAddress(array $address): string
 {
-    if (!empty($address['formatted'])) {
-        return $address['formatted'];
+    $formatted = '';
+
+    if (!empty($address['formatted']) && !containsLatinLetters($address['formatted'])) {
+        $formatted = $address['formatted'];
+    } else {
+        $parts = array_filter([
+            $address['street'] ?? '',
+            $address['city'] ?? '',
+            $address['province'] ?? '',
+            $address['postalCode'] ?? '',
+            $address['country'] ?? '',
+        ]);
+        $formatted = implode('، ', $parts);
+
+        if ($formatted === '' && !empty($address['formatted'])) {
+            $formatted = $address['formatted'];
+        }
     }
 
-    $parts = array_filter([
-        $address['street'] ?? '',
-        $address['city'] ?? '',
-        $address['province'] ?? '',
-        $address['postalCode'] ?? '',
-        $address['country'] ?? '',
-    ]);
+    return convertToPersianDigits($formatted);
+}
 
-    return implode('، ', $parts);
+function formatPhoneDisplay(string $phone): string
+{
+    $trimmed = trim($phone);
+    if ($trimmed === '') {
+        return '';
+    }
+
+    return convertToPersianDigits($trimmed);
+}
+
+function containsLatinLetters(string $text): bool
+{
+    return preg_match('/[A-Za-z]/u', $text) === 1;
+}
+
+function convertToPersianDigits(string $value): string
+{
+    $westernDigits = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+    $persianDigits = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
+
+    return str_replace($westernDigits, $persianDigits, $value);
 }
 
 function getMonogramLetter(string $text): string
