@@ -48,24 +48,24 @@ if (!is_dir(MESSAGE_DIRECTORY)) {
 }
 
 $businessDefaults = [
-    'name' => getenv('BUSINESS_NAME') ?: 'کلینیک دندانپزشکی الَنزا (Elanza Dental)',
-    'description' => getenv('BUSINESS_DESCRIPTION') ?: 'کلینیک دندانپزشکی الَنزا در کرمانشاه با تیمی مجرب و تجهیزات دیجیتال، درمان‌های تخصصی ایمپلنت، ارتودنسی و زیبایی را همراه با پیگیری دقیق بیماران ارائه می‌کند.',
-    'phone' => getenv('BUSINESS_PHONE') ?: '+98 930 595 8954',
-    'email' => getenv('BUSINESS_EMAIL') ?: 'info@elanzadental.ir',
-    'website' => getenv('BUSINESS_WEBSITE') ?: 'https://dr-mohammad.setaei.com/Elanza-main/',
+    'name' => getenv('BUSINESS_NAME') ?: 'کلینیک دندانپزشکی الَنزا',
+    'description' => getenv('BUSINESS_DESCRIPTION') ?: 'کلینیک دندانپزشکی الَنزا با بهره‌گیری از تجهیزات پیشرفته و تیمی متخصص، خدمات جامع دندانپزشکی زیبایی و درمانی را در محیطی حرفه‌ای ارائه می‌دهد.',
+    'phone' => getenv('BUSINESS_PHONE') ?: '+98 912 000 0000',
+    'email' => getenv('BUSINESS_EMAIL') ?: 'info@example.com',
+    'website' => getenv('BUSINESS_WEBSITE') ?: 'https://elanza.example.com',
     'address' => [
-        'street' => getenv('BUSINESS_STREET') ?: 'کرمانشاه، بلوار آزادی، نبش خیابان ۱۰۶',
-        'city' => getenv('BUSINESS_CITY') ?: 'کرمانشاه',
-        'province' => getenv('BUSINESS_PROVINCE') ?: 'استان کرمانشاه',
-        'postalCode' => getenv('BUSINESS_POSTAL_CODE') ?: '6714686594',
+        'street' => getenv('BUSINESS_STREET') ?: 'تهران، خیابان مثال، پلاک ۱۰',
+        'city' => getenv('BUSINESS_CITY') ?: 'تهران',
+        'province' => getenv('BUSINESS_PROVINCE') ?: 'تهران',
+        'postalCode' => getenv('BUSINESS_POSTAL_CODE') ?: '1234567890',
         'country' => getenv('BUSINESS_COUNTRY') ?: 'ایران',
     ],
     'coordinates' => [
-        'lat' => (float) (getenv('BUSINESS_LATITUDE') ?: '34.3276'),
-        'lng' => (float) (getenv('BUSINESS_LONGITUDE') ?: '47.0779'),
+        'lat' => (float) (getenv('BUSINESS_LATITUDE') ?: '35.715298'),
+        'lng' => (float) (getenv('BUSINESS_LONGITUDE') ?: '51.404343'),
     ],
-    'bookingUrl' => getenv('BOOKING_URL') ?: 'https://wa.me/989305958954',
-    'mapEmbed' => getenv('CONTACT_MAP_EMBED') ?: 'https://www.google.com/maps?hl=fa&q=Elanza%20Dental%2C%20Kermanshah&output=embed',
+    'bookingUrl' => getenv('BOOKING_URL') ?: 'https://calendar.google.com',
+    'mapEmbed' => getenv('CONTACT_MAP_EMBED') ?: '',
 ];
 
 $placesApiKey = getenv('GOOGLE_PLACES_API_KEY') ?: '';
@@ -120,12 +120,6 @@ $structuredData = buildStructuredData($business);
         }
         .navbar {
             box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
-        }
-        .navbar-light .navbar-toggler {
-            border: none;
-        }
-        .navbar-light .navbar-toggler:focus {
-            box-shadow: none;
         }
         .hero {
             background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(56, 189, 248, 0.15));
@@ -182,7 +176,7 @@ $structuredData = buildStructuredData($business);
     </script>
 </head>
 <body>
-<nav class="navbar navbar-expand-lg navbar-light bg-white sticky-top">
+<nav class="navbar navbar-expand-lg bg-white sticky-top">
     <div class="container">
         <a class="navbar-brand fw-bold" href="#hero"><?= htmlspecialchars($business['name'], ENT_QUOTES, 'UTF-8'); ?></a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="باز کردن منو">
@@ -206,7 +200,7 @@ $structuredData = buildStructuredData($business);
     <div class="container">
         <div class="row align-items-center">
             <div class="col-lg-6 mb-4 mb-lg-0">
-                <h1 class="display-5 mb-3"><?= htmlspecialchars(sprintf('لبخندی درخشان با %s', $business['name']), ENT_QUOTES, 'UTF-8'); ?></h1>
+                <h1 class="display-5 mb-3">لبخندی درخشان با کلینیک دندانپزشکی الَنزا</h1>
                 <p class="lead mb-4"><?= htmlspecialchars($business['description'], ENT_QUOTES, 'UTF-8'); ?></p>
                 <div class="d-flex flex-wrap gap-3">
                     <a class="btn btn-primary btn-lg rounded-pill" href="<?= htmlspecialchars($business['bookingUrl'], ENT_QUOTES, 'UTF-8'); ?>" target="_blank" rel="noopener">
@@ -553,8 +547,8 @@ function enrichBusinessData(array $defaults, ?array $placeDetails, string $apiKe
         $result['googleUrl'] = buildGoogleUrl($result['name']);
     }
 
-    $result['rating'] = $placeDetails['rating'] ?? 4.8;
-    $result['reviewCount'] = $placeDetails['user_ratings_total'] ?? 26;
+    $result['rating'] = $placeDetails['rating'] ?? 4.9;
+    $result['reviewCount'] = $placeDetails['user_ratings_total'] ?? 0;
     $result['openingHours'] = normalizeOpeningHours($placeDetails['opening_hours']['weekday_text'] ?? []);
     $result['services'] = getDefaultServices();
     $result['gallery'] = [
@@ -589,8 +583,8 @@ function normalizeOpeningHours(array $weekdayText): array
     }
 
     return [
-        ['day' => 'شنبه تا چهارشنبه', 'hours' => '۰۹:۳۰ تا ۱۸:۳۰'],
-        ['day' => 'پنجشنبه', 'hours' => '۰۹:۳۰ تا ۱۴:۰۰'],
+        ['day' => 'شنبه تا چهارشنبه', 'hours' => '۰۹:۳۰ تا ۱۸:۰۰'],
+        ['day' => 'پنجشنبه', 'hours' => '۰۹:۳۰ تا ۱۳:۰۰'],
         ['day' => 'جمعه', 'hours' => 'تعطیل'],
     ];
 }
