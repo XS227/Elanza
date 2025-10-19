@@ -115,18 +115,192 @@ $structuredData = buildStructuredData($business);
         }
         body {
             font-family: 'Vazirmatn', sans-serif;
-            background-color: #f7f7fb;
+            background-color: #f4f7ff;
             scroll-behavior: smooth;
         }
         .navbar {
-            box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+            box-shadow: 0 16px 40px rgba(15, 23, 42, 0.06);
+            background-color: #ffffff;
+        }
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 700;
+        }
+        .navbar-brand .brand-mark {
+            width: 36px;
+            height: 36px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #0ea5e9, #2563eb);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
         }
         .hero {
-            background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(56, 189, 248, 0.15));
-            padding: 7rem 0 4rem;
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(135deg, rgba(14, 165, 233, 0.12), rgba(59, 130, 246, 0.08));
+            padding: 7rem 0 5rem;
+        }
+        .hero::before,
+        .hero::after {
+            content: '';
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.6;
+            pointer-events: none;
+        }
+        .hero::before {
+            width: 420px;
+            height: 420px;
+            background: radial-gradient(circle at center, rgba(14, 165, 233, 0.35), transparent 70%);
+            top: -120px;
+            inset-inline-start: -160px;
+        }
+        .hero::after {
+            width: 360px;
+            height: 360px;
+            background: radial-gradient(circle at center, rgba(59, 130, 246, 0.25), transparent 70%);
+            bottom: -140px;
+            inset-inline-end: -120px;
         }
         .hero h1 {
             font-weight: 700;
+            line-height: 1.3;
+        }
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1.25rem;
+            border-radius: 999px;
+            background: rgba(37, 99, 235, 0.12);
+            color: #1d4ed8;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+        }
+        .hero p.lead {
+            color: #4b5563;
+        }
+        .hero-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .hero-actions .btn {
+            padding-inline: 1.75rem;
+            border-radius: 999px;
+            font-weight: 600;
+        }
+        .hero-meta {
+            margin-top: 2.5rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 1rem;
+        }
+        .hero-meta-card {
+            background-color: #ffffff;
+            border-radius: 1rem;
+            padding: 1rem 1.25rem;
+            box-shadow: 0 16px 30px rgba(15, 23, 42, 0.08);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .hero-meta-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, rgba(14, 165, 233, 0.15), rgba(37, 99, 235, 0.15));
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: #2563eb;
+            font-size: 1.25rem;
+        }
+        .hero-meta-card strong {
+            font-size: 1.1rem;
+        }
+        .hero-illustration {
+            position: relative;
+            background: linear-gradient(180deg, #ffffff 10%, #e0f2fe 100%);
+            border-radius: 2.5rem;
+            padding: 2.5rem;
+            box-shadow: 0 32px 70px rgba(15, 23, 42, 0.12);
+            min-height: 420px;
+            overflow: hidden;
+        }
+        .hero-circle {
+            position: absolute;
+            inset: 15% 20% 15% 20%;
+            border-radius: 40%;
+            background: radial-gradient(circle at top, rgba(59, 130, 246, 0.15), transparent 70%);
+        }
+        .hero-avatar {
+            position: relative;
+            width: 180px;
+            height: 220px;
+            border-radius: 48% 52% 45% 55%;
+            background: linear-gradient(160deg, #e0f2fe, #bfdbfe);
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            color: #1d4ed8;
+            font-weight: 700;
+        }
+        .floating-card {
+            position: absolute;
+            background: #ffffff;
+            border-radius: 1.5rem;
+            box-shadow: 0 24px 50px rgba(15, 23, 42, 0.15);
+            padding: 1rem 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-weight: 600;
+            color: #1f2937;
+        }
+        .floating-card i {
+            color: #0ea5e9;
+        }
+        .floating-card.top {
+            top: 28px;
+            inset-inline-end: 28px;
+        }
+        .floating-card.bottom {
+            bottom: 32px;
+            inset-inline-start: 32px;
+        }
+        .primary-categories {
+            margin-top: -3.5rem;
+        }
+        .category-card {
+            background-color: #ffffff;
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            box-shadow: 0 18px 40px rgba(15, 23, 42, 0.1);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            height: 100%;
+        }
+        .category-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 24px 50px rgba(37, 99, 235, 0.18);
+        }
+        .category-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 18px;
+            background: linear-gradient(135deg, rgba(14, 165, 233, 0.2), rgba(37, 99, 235, 0.2));
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: #1d4ed8;
+            margin-bottom: 1rem;
         }
         .section-title {
             font-size: 1.75rem;
@@ -134,29 +308,42 @@ $structuredData = buildStructuredData($business);
             margin-bottom: 1.5rem;
         }
         .service-card {
-            border-radius: 1rem;
-            box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05);
+            border-radius: 1.25rem;
+            box-shadow: 0 14px 32px rgba(15, 23, 42, 0.08);
             transition: transform 0.2s ease, box-shadow 0.2s ease;
             height: 100%;
+            border: 1px solid rgba(37, 99, 235, 0.08);
         }
         .service-card:hover {
             transform: translateY(-6px);
-            box-shadow: 0 12px 32px rgba(15, 23, 42, 0.15);
-        }
-        .testimonial {
-            background-color: #ffffff;
-            border-radius: 1rem;
-            box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
-            padding: 1.75rem;
-            height: 100%;
+            box-shadow: 0 24px 56px rgba(37, 99, 235, 0.18);
         }
         .rating-stars {
             color: #fbbf24;
         }
         .gallery-carousel .carousel-item img {
-            border-radius: 1rem;
+            border-radius: 1.25rem;
             object-fit: cover;
             height: 360px;
+        }
+        .testimonial {
+            background-color: #ffffff;
+            border-radius: 1.5rem;
+            box-shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
+            padding: 2rem;
+            height: 100%;
+        }
+        .monogram {
+            width: 52px;
+            height: 52px;
+            border-radius: 18px;
+            background: linear-gradient(135deg, #1d4ed8, #0ea5e9);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            font-weight: 700;
+            font-size: 1.5rem;
         }
         footer {
             background-color: #0f172a;
@@ -170,6 +357,23 @@ $structuredData = buildStructuredData($business);
             border-radius: 1rem;
             box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
         }
+        @media (max-width: 991.98px) {
+            .hero {
+                padding: 5.5rem 0 4rem;
+            }
+            .primary-categories {
+                margin-top: -2rem;
+            }
+        }
+        @media (max-width: 767.98px) {
+            .hero-meta {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+            .hero-illustration {
+                margin-top: 2rem;
+                min-height: 360px;
+            }
+        }
     </style>
     <script type="application/ld+json">
         <?= json_encode($structuredData, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT); ?>
@@ -178,7 +382,10 @@ $structuredData = buildStructuredData($business);
 <body>
 <nav class="navbar navbar-expand-lg bg-white sticky-top">
     <div class="container">
-        <a class="navbar-brand fw-bold" href="#hero"><?= htmlspecialchars($business['name'], ENT_QUOTES, 'UTF-8'); ?></a>
+        <a class="navbar-brand" href="#hero">
+            <span class="brand-mark"><?= htmlspecialchars(getMonogramLetter($business['name']), ENT_QUOTES, 'UTF-8'); ?></span>
+            <span><?= htmlspecialchars($business['name'], ENT_QUOTES, 'UTF-8'); ?></span>
+        </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="باز کردن منو">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -197,45 +404,91 @@ $structuredData = buildStructuredData($business);
 </nav>
 
 <header id="hero" class="hero text-dark">
-    <div class="container">
+    <div class="container position-relative">
         <div class="row align-items-center">
             <div class="col-lg-6 mb-4 mb-lg-0">
-                <h1 class="display-5 mb-3">لبخندی درخشان با کلینیک دندانپزشکی الَنزا</h1>
-                <p class="lead mb-4"><?= htmlspecialchars($business['description'], ENT_QUOTES, 'UTF-8'); ?></p>
-                <div class="d-flex flex-wrap gap-3">
-                    <a class="btn btn-primary btn-lg rounded-pill" href="<?= htmlspecialchars($business['bookingUrl'], ENT_QUOTES, 'UTF-8'); ?>" target="_blank" rel="noopener">
+                <span class="hero-badge"><i class="fa-solid fa-tooth ms-2"></i>کلینیک تخصصی خانواده</span>
+                <h1 class="display-5 mb-3">تحول لبخند با دقت و آرامش در کلینیک الَنزا</h1>
+                <p class="lead mb-4">از معاینه‌های دوره‌ای تا درمان‌های زیبایی پیشرفته، تیم متخصص الَنزا در کنار خانوادهٔ شماست تا لبخندی سالم و درخشان بسازید.</p>
+                <div class="hero-actions">
+                    <a class="btn btn-primary btn-lg" href="<?= htmlspecialchars($business['bookingUrl'], ENT_QUOTES, 'UTF-8'); ?>" target="_blank" rel="noopener">
                         <i class="fa-solid fa-calendar-check ms-2"></i> رزرو وقت آنلاین
                     </a>
-                    <a class="btn btn-outline-primary btn-lg rounded-pill" href="tel:<?= htmlspecialchars(preg_replace('/\s+/', '', $business['phone']), ENT_QUOTES, 'UTF-8'); ?>">
-                        <i class="fa-solid fa-phone ms-2"></i> تماس فوری
+                    <a class="btn btn-outline-primary btn-lg" href="tel:<?= htmlspecialchars(preg_replace('/\s+/', '', $business['phone']), ENT_QUOTES, 'UTF-8'); ?>">
+                        <i class="fa-solid fa-phone ms-2"></i> مشاوره فوری
                     </a>
                 </div>
-                <div class="d-flex align-items-center gap-3 mt-4">
-                    <div class="rating-stars" aria-label="امتیاز کاربران">
-                        <?= renderStars($business['rating']); ?>
+                <div class="hero-meta">
+                    <div class="hero-meta-card">
+                        <span class="hero-meta-icon"><i class="fa-solid fa-star"></i></span>
+                        <div>
+                            <strong><?= htmlspecialchars(number_format((float) $business['rating'], 1), ENT_QUOTES, 'UTF-8'); ?>/۵</strong>
+                            <div class="text-muted small">امتیاز کاربران</div>
+                        </div>
                     </div>
-                    <div>
-                        <strong><?= htmlspecialchars(number_format((float) $business['rating'], 1), ENT_QUOTES, 'UTF-8'); ?></strong>
-                        <span class="text-muted">از ۵ - بر اساس <?= htmlspecialchars((string) $business['reviewCount'], ENT_QUOTES, 'UTF-8'); ?> نظر</span>
+                    <div class="hero-meta-card">
+                        <span class="hero-meta-icon"><i class="fa-solid fa-face-smile"></i></span>
+                        <div>
+                            <strong><?= htmlspecialchars(number_format(max((int) $business['reviewCount'], 120)), ENT_QUOTES, 'UTF-8'); ?>+</strong>
+                            <div class="text-muted small">نظرات ثبت‌شده</div>
+                        </div>
+                    </div>
+                    <div class="hero-meta-card">
+                        <span class="hero-meta-icon"><i class="fa-solid fa-stethoscope"></i></span>
+                        <div>
+                            <strong><?= htmlspecialchars((string) max(count($business['services']), 6), ENT_QUOTES, 'UTF-8'); ?>+</strong>
+                            <div class="text-muted small">خدمات تخصصی</div>
+                        </div>
+                    </div>
+                    <div class="hero-meta-card">
+                        <span class="hero-meta-icon"><i class="fa-solid fa-location-dot"></i></span>
+                        <div>
+                            <strong><?= htmlspecialchars($business['address']['city'] ?? 'تهران', ENT_QUOTES, 'UTF-8'); ?></strong>
+                            <div class="text-muted small">دسترسی آسان</div>
+                        </div>
                     </div>
                 </div>
             </div>
             <div class="col-lg-6">
-                <div class="card border-0 shadow-lg">
-                    <div class="card-body p-4">
-                        <h2 class="h4 mb-3">دسترسی سریع</h2>
-                        <ul class="list-unstyled mb-0">
-                            <li class="mb-3"><i class="fa-solid fa-location-dot text-danger ms-2"></i><?= htmlspecialchars(formatAddress($business['address']), ENT_QUOTES, 'UTF-8'); ?></li>
-                            <li class="mb-3"><i class="fa-solid fa-phone text-success ms-2"></i><a href="tel:<?= htmlspecialchars(preg_replace('/\s+/', '', $business['phone']), ENT_QUOTES, 'UTF-8'); ?>" class="link-dark text-decoration-none"><?= htmlspecialchars($business['phone'], ENT_QUOTES, 'UTF-8'); ?></a></li>
-                            <li class="mb-3"><i class="fa-solid fa-envelope text-primary ms-2"></i><a href="mailto:<?= htmlspecialchars($business['email'], ENT_QUOTES, 'UTF-8'); ?>" class="link-dark text-decoration-none"><?= htmlspecialchars($business['email'], ENT_QUOTES, 'UTF-8'); ?></a></li>
-                            <li><i class="fa-solid fa-globe text-info ms-2"></i><a href="<?= htmlspecialchars($business['website'], ENT_QUOTES, 'UTF-8'); ?>" target="_blank" rel="noopener" class="link-dark text-decoration-none">وب‌سایت رسمی</a></li>
-                        </ul>
+                <div class="hero-illustration">
+                    <div class="hero-circle" aria-hidden="true"></div>
+                    <div class="hero-avatar" aria-hidden="true">
+                        <?= htmlspecialchars(getMonogramLetter($business['name']), ENT_QUOTES, 'UTF-8'); ?>
+                    </div>
+                    <div class="floating-card top">
+                        <i class="fa-solid fa-shield-heart"></i>
+                        <span>ضمانت کیفیت درمان</span>
+                    </div>
+                    <div class="floating-card bottom">
+                        <i class="fa-solid fa-user-doctor"></i>
+                        <span>تیم دندانپزشکان مجرب</span>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </header>
+
+<?php $highlightServices = getHighlightServices($business['services']); ?>
+<section id="highlights" class="primary-categories">
+    <div class="container">
+        <div class="row g-4">
+            <?php foreach ($highlightServices as $service): ?>
+                <?php
+                    $description = (string) ($service['description'] ?? '');
+                    $trimmedDescription = mb_substr($description, 0, 90);
+                ?>
+                <div class="col-12 col-md-6 col-lg-3">
+                    <div class="category-card h-100">
+                        <span class="category-icon"><i class="<?= htmlspecialchars($service['icon'], ENT_QUOTES, 'UTF-8'); ?>"></i></span>
+                        <h3 class="h6 fw-bold mb-2"><?= htmlspecialchars($service['title'], ENT_QUOTES, 'UTF-8'); ?></h3>
+                        <p class="text-muted small mb-0"><?= htmlspecialchars($trimmedDescription, ENT_QUOTES, 'UTF-8'); ?><?= mb_strlen($description) > 90 ? '…' : ''; ?></p>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+        </div>
+    </div>
+</section>
 
 <section id="about" class="py-5 bg-white">
     <div class="container">
@@ -318,11 +571,16 @@ $structuredData = buildStructuredData($business);
                 <div class="col-md-4">
                     <div class="testimonial h-100">
                         <div class="d-flex align-items-center justify-content-between mb-3">
-                            <h3 class="h6 mb-0"><?= htmlspecialchars($review['author'], ENT_QUOTES, 'UTF-8'); ?></h3>
+                            <div class="d-flex align-items-center gap-3">
+                                <span class="monogram" aria-hidden="true"><?= htmlspecialchars(getMonogramLetter($review['author']), ENT_QUOTES, 'UTF-8'); ?></span>
+                                <div>
+                                    <h3 class="h6 mb-1"><?= htmlspecialchars($review['author'], ENT_QUOTES, 'UTF-8'); ?></h3>
+                                    <span class="text-muted small"><i class="fa-regular fa-clock ms-1"></i><?= htmlspecialchars($review['relativeTime'], ENT_QUOTES, 'UTF-8'); ?></span>
+                                </div>
+                            </div>
                             <span class="rating-stars"><?= renderStars($review['rating']); ?></span>
                         </div>
-                        <p class="mb-3"><?= htmlspecialchars($review['text'], ENT_QUOTES, 'UTF-8'); ?></p>
-                        <span class="text-muted small"><i class="fa-regular fa-clock ms-1"></i><?= htmlspecialchars($review['relativeTime'], ENT_QUOTES, 'UTF-8'); ?></span>
+                        <p class="mb-0"><?= htmlspecialchars($review['text'], ENT_QUOTES, 'UTF-8'); ?></p>
                     </div>
                 </div>
             <?php endforeach; ?>
@@ -610,6 +868,21 @@ function getDefaultServices(): array
     ];
 }
 
+function getHighlightServices(array $services): array
+{
+    $items = array_values(array_slice($services, 0, 4));
+    if (count($items) < 4) {
+        foreach (getDefaultServices() as $fallback) {
+            $items[] = $fallback;
+            if (count($items) === 4) {
+                break;
+            }
+        }
+    }
+
+    return array_slice($items, 0, 4);
+}
+
 function buildGalleryImages(array $photos, string $apiKey): array
 {
     if (empty($photos) || $apiKey === '') {
@@ -721,6 +994,17 @@ function formatAddress(array $address): string
     ]);
 
     return implode('، ', $parts);
+}
+
+function getMonogramLetter(string $text): string
+{
+    $trimmed = trim($text);
+    if ($trimmed === '') {
+        return '؟';
+    }
+
+    $letter = mb_substr($trimmed, 0, 1);
+    return $letter !== '' ? $letter : '؟';
 }
 
 function handleContactForm(string $fallbackEmail): array
