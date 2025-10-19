@@ -7,6 +7,15 @@ const CACHE_DIRECTORY = __DIR__ . '/storage/cache';
 const CACHE_FILE = CACHE_DIRECTORY . '/google_place.json';
 const MESSAGE_DIRECTORY = __DIR__ . '/storage/messages';
 
+function getBusinessGoogleUrl(): string
+{
+    $configured = getenv('BUSINESS_GOOGLE_URL');
+
+    return $configured !== false && $configured !== ''
+        ? $configured
+        : 'https://maps.app.goo.gl/cbgjZXmMjpR8kgZT8';
+}
+
 /**
  * Load environment variables from a simple .env file.
  */
@@ -53,6 +62,7 @@ $businessDefaults = [
     'phone' => getenv('BUSINESS_PHONE') ?: '+98 912 000 0000',
     'email' => getenv('BUSINESS_EMAIL') ?: 'info@example.com',
     'website' => getenv('BUSINESS_WEBSITE') ?: 'https://elanza.example.com',
+    'googleUrl' => getBusinessGoogleUrl(),
     'address' => [
         'street' => getenv('BUSINESS_STREET') ?: 'تهران، خیابان مثال، پلاک ۱۰',
         'city' => getenv('BUSINESS_CITY') ?: 'تهران',
@@ -78,7 +88,8 @@ $business = enrichBusinessData($businessDefaults, $placeDetails, $placesApiKey);
 
 [$formStatus, $formErrors] = handleContactForm($business['email']);
 
-$metaImage = $business['gallery']['images'][0]['url'] ?? 'https://via.placeholder.com/1200x630.png?text=Elanza+Dental';
+$primaryGalleryImage = firstGalleryImageUrl($business['gallery']['images'] ?? []);
+$metaImage = $primaryGalleryImage ?? 'https://via.placeholder.com/1200x630.png?text=Elanza+Dental';
 $canonicalUrl = $business['googleUrl'] ?? $business['website'];
 $structuredData = buildStructuredData($business);
 
@@ -326,6 +337,14 @@ $structuredData = buildStructuredData($business);
             object-fit: cover;
             height: 360px;
         }
+        .gallery-carousel .carousel-item .gallery-streetview-wrapper {
+            border-radius: 1.25rem;
+            overflow: hidden;
+        }
+        .gallery-carousel .carousel-item .gallery-streetview-wrapper iframe {
+            border: 0;
+            border-radius: 1.25rem;
+        }
         .testimonial {
             background-color: #ffffff;
             border-radius: 1.5rem;
@@ -534,14 +553,21 @@ $structuredData = buildStructuredData($business);
     <div class="container">
         <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-3">
             <h2 class="section-title mb-0">نمونه‌کارها و فضای کلینیک</h2>
-            <span class="text-muted">برای مشاهدهٔ کامل تصاویر، به گالری گوگل سر بزنید.</span>
+            <span class="text-muted">برای مشاهدهٔ کامل تصاویر، به <a href="<?= htmlspecialchars($business['googleUrl'], ENT_QUOTES, 'UTF-8'); ?>" class="link-primary text-decoration-none" target="_blank" rel="noopener">گالری گوگل</a> سر بزنید.</span>
         </div>
         <?php if (!empty($business['gallery']['images'])): ?>
             <div id="clinicGallery" class="carousel slide gallery-carousel" data-bs-ride="carousel">
                 <div class="carousel-inner">
                     <?php foreach ($business['gallery']['images'] as $index => $image): ?>
+                        <?php $itemType = $image['type'] ?? 'image'; ?>
                         <div class="carousel-item <?= $index === 0 ? 'active' : ''; ?>">
-                            <img src="<?= htmlspecialchars($image['url'], ENT_QUOTES, 'UTF-8'); ?>" class="d-block w-100" alt="<?= htmlspecialchars($image['alt'], ENT_QUOTES, 'UTF-8'); ?>">
+                            <?php if ($itemType === 'streetview' && !empty($image['embedUrl'])): ?>
+                                <div class="ratio ratio-16x9 gallery-streetview-wrapper">
+                                    <iframe src="<?= htmlspecialchars($image['embedUrl'], ENT_QUOTES, 'UTF-8'); ?>" allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="<?= htmlspecialchars($image['alt'] ?? 'نمای Street View', ENT_QUOTES, 'UTF-8'); ?>"></iframe>
+                                </div>
+                            <?php else: ?>
+                                <img src="<?= htmlspecialchars($image['url'] ?? '', ENT_QUOTES, 'UTF-8'); ?>" class="d-block w-100" alt="<?= htmlspecialchars($image['alt'] ?? 'تصویر کلینیک', ENT_QUOTES, 'UTF-8'); ?>" loading="lazy">
+                            <?php endif; ?>
                         </div>
                     <?php endforeach; ?>
                 </div>
@@ -793,7 +819,6 @@ function enrichBusinessData(array $defaults, ?array $placeDetails, string $apiKe
         $result['name'] = $placeDetails['name'] ?? $result['name'];
         $result['phone'] = $placeDetails['international_phone_number'] ?? $result['phone'];
         $result['website'] = $placeDetails['website'] ?? $result['website'];
-        $result['googleUrl'] = $placeDetails['url'] ?? buildGoogleUrl($placeDetails['name'] ?? $result['name']);
         if (!empty($placeDetails['geometry']['location'])) {
             $result['coordinates']['lat'] = (float) ($placeDetails['geometry']['location']['lat'] ?? $result['coordinates']['lat']);
             $result['coordinates']['lng'] = (float) ($placeDetails['geometry']['location']['lng'] ?? $result['coordinates']['lng']);
@@ -801,6 +826,13 @@ function enrichBusinessData(array $defaults, ?array $placeDetails, string $apiKe
         if (!empty($placeDetails['formatted_address'])) {
             $result['address']['formatted'] = $placeDetails['formatted_address'];
         }
+    }
+
+    $configuredGoogleUrl = getBusinessGoogleUrl();
+    if ($configuredGoogleUrl !== '') {
+        $result['googleUrl'] = $configuredGoogleUrl;
+    } elseif (is_array($placeDetails) && !empty($placeDetails['url'])) {
+        $result['googleUrl'] = $placeDetails['url'];
     } else {
         $result['googleUrl'] = buildGoogleUrl($result['name']);
     }
@@ -809,12 +841,17 @@ function enrichBusinessData(array $defaults, ?array $placeDetails, string $apiKe
     $result['reviewCount'] = $placeDetails['user_ratings_total'] ?? 0;
     $result['openingHours'] = normalizeOpeningHours($placeDetails['opening_hours']['weekday_text'] ?? []);
     $result['services'] = getDefaultServices();
-    $result['gallery'] = [
-        'images' => buildGalleryImages($placeDetails['photos'] ?? [], $apiKey),
-    ];
-    if (empty($result['gallery']['images'])) {
-        $result['gallery']['images'] = localGalleryImages();
+    $galleryItems = buildGalleryImages($placeDetails['photos'] ?? [], $apiKey);
+    if (empty($galleryItems)) {
+        $galleryItems = localGalleryImages();
     }
+    $streetViewItem = buildStreetViewGalleryItem($result['coordinates']);
+    if ($streetViewItem !== null) {
+        array_unshift($galleryItems, $streetViewItem);
+    }
+    $result['gallery'] = [
+        'images' => $galleryItems,
+    ];
     $result['reviews'] = normalizeReviews($placeDetails['reviews'] ?? []);
     if (empty($result['reviews'])) {
         $result['reviews'] = fallbackReviews();
@@ -825,6 +862,11 @@ function enrichBusinessData(array $defaults, ?array $placeDetails, string $apiKe
 
 function buildGoogleUrl(string $name): string
 {
+    $configured = getBusinessGoogleUrl();
+    if ($configured !== '') {
+        return $configured;
+    }
+
     return 'https://www.google.com/maps/search/?api=1&query=' . urlencode($name);
 }
 
@@ -900,12 +942,36 @@ function buildGalleryImages(array $photos, string $apiKey): array
             urlencode($apiKey)
         );
         $images[] = [
+            'type' => 'image',
             'url' => $photoUrl,
             'alt' => 'تصویر از کلینیک الَنزا',
         ];
     }
 
     return $images;
+}
+
+function buildStreetViewGalleryItem(array $coordinates): ?array
+{
+    $lat = $coordinates['lat'] ?? null;
+    $lng = $coordinates['lng'] ?? null;
+    if (!is_numeric($lat) || !is_numeric($lng)) {
+        return null;
+    }
+
+    $lat = (float) $lat;
+    $lng = (float) $lng;
+    $embedUrl = sprintf(
+        'https://www.google.com/maps/embed?pb=&q=&layer=c&cbll=%1$.6f,%2$.6f&cbp=11,0,0,0,0',
+        $lat,
+        $lng
+    );
+
+    return [
+        'type' => 'streetview',
+        'embedUrl' => $embedUrl,
+        'alt' => 'نمای خیابانی کلینیک الَنزا',
+    ];
 }
 
 function localGalleryImages(): array
@@ -919,12 +985,36 @@ function localGalleryImages(): array
     $images = [];
     foreach ($files as $file) {
         $images[] = [
+            'type' => 'image',
             'url' => 'images/' . basename($file),
             'alt' => 'نمونه‌کار کلینیک الَنزا',
         ];
     }
 
     return $images;
+}
+
+function firstGalleryImageUrl(array $items): ?string
+{
+    foreach ($items as $item) {
+        if (($item['type'] ?? 'image') === 'image' && !empty($item['url'])) {
+            return $item['url'];
+        }
+    }
+
+    return null;
+}
+
+function galleryImageUrls(array $items): array
+{
+    $urls = [];
+    foreach ($items as $item) {
+        if (($item['type'] ?? 'image') === 'image' && !empty($item['url'])) {
+            $urls[] = $item['url'];
+        }
+    }
+
+    return $urls;
 }
 
 function normalizeReviews(array $reviews): array
@@ -1118,7 +1208,7 @@ function buildStructuredData(array $business): array
         '@type' => 'Dentist',
         'name' => $business['name'],
         'description' => $business['description'],
-        'image' => array_column($business['gallery']['images'], 'url'),
+        'image' => galleryImageUrls($business['gallery']['images'] ?? []),
         'url' => $business['website'],
         'telephone' => $business['phone'],
         'email' => $business['email'],
