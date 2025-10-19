@@ -1,0 +1,15 @@
+/vendor/
+/node_modules/
+/.env
+.env
+.env.local
+.env.*
+!*.example
+storage/cache/*.json
+storage/cache/*.tmp
+storage/cache/*.cache
+storage/messages/*.txt
+.DS_Store
+npm-debug.log*
+yarn-error.log
+.idea/

@@ -1,0 +1,4 @@
+# Ignore cached API responses while keeping the directory
+*.json
+*.tmp
+*.cache
