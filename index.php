@@ -474,15 +474,21 @@ $structuredData = buildStructuredData($business);
     <div class="container">
         <div class="row g-4">
             <?php foreach ($highlightServices as $service): ?>
-                <?php
-                    $description = (string) ($service['description'] ?? '');
-                    $trimmedDescription = mb_substr($description, 0, 90);
-                ?>
                 <div class="col-12 col-md-6 col-lg-3">
                     <div class="category-card h-100">
                         <span class="category-icon"><i class="<?= htmlspecialchars($service['icon'], ENT_QUOTES, 'UTF-8'); ?>"></i></span>
                         <h3 class="h6 fw-bold mb-2"><?= htmlspecialchars($service['title'], ENT_QUOTES, 'UTF-8'); ?></h3>
-                        <p class="text-muted small mb-0"><?= htmlspecialchars($trimmedDescription, ENT_QUOTES, 'UTF-8'); ?><?= mb_strlen($description) > 90 ? '…' : ''; ?></p>
+                        <p class="text-muted small mb-3"><?= htmlspecialchars((string) ($service['description'] ?? ''), ENT_QUOTES, 'UTF-8'); ?></p>
+                        <?php if (!empty($service['items']) && is_array($service['items'])): ?>
+                            <ul class="list-unstyled text-muted small mb-0">
+                                <?php foreach ($service['items'] as $item): ?>
+                                    <li class="d-flex align-items-start mb-1">
+                                        <i class="fa-solid fa-circle-dot text-primary ms-2 mt-1"></i>
+                                        <span><?= htmlspecialchars((string) $item, ENT_QUOTES, 'UTF-8'); ?></span>
+                                    </li>
+                                <?php endforeach; ?>
+                            </ul>
+                        <?php endif; ?>
                     </div>
                 </div>
             <?php endforeach; ?>
@@ -522,7 +528,17 @@ $structuredData = buildStructuredData($business);
                             <span class="badge bg-primary-subtle text-primary-emphasis ms-2"><i class="<?= htmlspecialchars($service['icon'], ENT_QUOTES, 'UTF-8'); ?>"></i></span>
                             <h3 class="h5 mb-0"><?= htmlspecialchars($service['title'], ENT_QUOTES, 'UTF-8'); ?></h3>
                         </div>
-                        <p class="text-muted mb-0"><?= htmlspecialchars($service['description'], ENT_QUOTES, 'UTF-8'); ?></p>
+                        <p class="text-muted mb-3"><?= htmlspecialchars($service['description'], ENT_QUOTES, 'UTF-8'); ?></p>
+                        <?php if (!empty($service['items']) && is_array($service['items'])): ?>
+                            <ul class="list-unstyled text-muted small mb-0">
+                                <?php foreach ($service['items'] as $item): ?>
+                                    <li class="d-flex align-items-start mb-1">
+                                        <i class="fa-solid fa-circle-check text-success ms-2 mt-1"></i>
+                                        <span><?= htmlspecialchars((string) $item, ENT_QUOTES, 'UTF-8'); ?></span>
+                                    </li>
+                                <?php endforeach; ?>
+                            </ul>
+                        <?php endif; ?>
                     </div>
                 </div>
             <?php endforeach; ?>
@@ -851,19 +867,40 @@ function getDefaultServices(): array
 {
     return [
         [
-            'title' => 'ایمپلنت و کاشت دندان',
-            'description' => 'بازگرداندن عملکرد و زیبایی لبخند با استفاده از ایمپلنت‌های پیشرفته و برنامه درمان اختصاصی.',
-            'icon' => 'fa-solid fa-tooth',
-        ],
-        [
-            'title' => 'ارتودنسی نامرئی',
-            'description' => 'تراز کردن دندان‌ها با الاینرهای شفاف و درمان‌های کم‌درد مناسب بزرگسالان و نوجوانان.',
-            'icon' => 'fa-solid fa-teeth-open',
-        ],
-        [
-            'title' => 'سفید کردن و زیبایی دندان',
-            'description' => 'استفاده از تکنیک‌های نوین سفید کردن و لمینیت برای داشتن لبخندی درخشان و طبیعی.',
+            'title' => 'زیبایی و اصلاح طرح لبخند',
+            'description' => 'تکنیک‌های تخصصی برای درخشندگی و هماهنگی لبخند.',
             'icon' => 'fa-solid fa-sparkles',
+            'items' => [
+                'کامپوزیت و ونیر کامپوزیت',
+                'لیفت لثه',
+            ],
+        ],
+        [
+            'title' => 'درمان‌های ترمیمی و ریشه',
+            'description' => 'بازسازی ساختار دندان و جلوگیری از گسترش آسیب.',
+            'icon' => 'fa-solid fa-tooth',
+            'items' => [
+                'پر کردن دندان',
+                'عصب‌کشی دقیق و بدون درد',
+            ],
+        ],
+        [
+            'title' => 'روکش و مراقبت‌های دوره‌ای',
+            'description' => 'حفظ استحکام و عملکرد دندان‌ها با راهکارهای اختصاصی.',
+            'icon' => 'fa-solid fa-shield-heart',
+            'items' => [
+                'روکش دندان',
+                'بروزرسانی و پایش منظم سرویس‌ها',
+            ],
+        ],
+        [
+            'title' => 'ایمپلنت و جراحی دندان',
+            'description' => 'بازگرداندن عملکرد طبیعی و زیبایی با روش‌های پیشرفته.',
+            'icon' => 'fa-solid fa-screwdriver-wrench',
+            'items' => [
+                'ایمپلنت کامل و واحد',
+                'انواع جراحی‌های مرتبط با دندان',
+            ],
         ],
     ];
 }
