@@ -74,7 +74,7 @@ $businessDefaults = [
         'lat' => (float) (getenv('BUSINESS_LATITUDE') ?: '35.715298'),
         'lng' => (float) (getenv('BUSINESS_LONGITUDE') ?: '51.404343'),
     ],
-    'bookingUrl' => getenv('BOOKING_URL') ?: 'https://calendar.google.com',
+    'bookingUrl' => getenv('BOOKING_URL') ?: '',
     'mapEmbed' => getenv('CONTACT_MAP_EMBED') ?: '',
 ];
 
@@ -85,6 +85,9 @@ $cacheTtl = (int) (getenv('CACHE_TTL_SECONDS') ?: 43200); // 12 hours by default
 $placeDetails = fetchGooglePlaceDetails($placesApiKey, $placeId, $cacheTtl);
 
 $business = enrichBusinessData($businessDefaults, $placeDetails, $placesApiKey);
+$business['bookingUrl'] = buildBookingLink($business['bookingUrl'] ?? '', $business['phone'] ?? '');
+$bookingLinkIsTel = str_starts_with($business['bookingUrl'], 'tel:');
+$callLink = buildTelLink($business['phone'] ?? '');
 
 [$formStatus, $formErrors] = handleContactForm($business['email']);
 
@@ -129,15 +132,27 @@ $structuredData = buildStructuredData($business);
             background-color: #f4f7ff;
             scroll-behavior: smooth;
         }
+        body.dark-theme {
+            background-color: #0f172a;
+            color: #e2e8f0;
+            color-scheme: dark;
+        }
         .navbar {
             box-shadow: 0 16px 40px rgba(15, 23, 42, 0.06);
             background-color: #ffffff;
+        }
+        body.dark-theme .navbar {
+            background-color: #111827 !important;
+            box-shadow: 0 16px 40px rgba(15, 23, 42, 0.3);
         }
         .navbar-brand {
             display: flex;
             align-items: center;
             gap: 0.5rem;
             font-weight: 700;
+        }
+        body.dark-theme .navbar-brand {
+            color: #f8fafc;
         }
         .navbar-brand .brand-mark {
             width: 36px;
@@ -149,11 +164,25 @@ $structuredData = buildStructuredData($business);
             justify-content: center;
             color: #fff;
         }
+        .navbar .nav-link {
+            transition: color 0.2s ease;
+        }
+        body.dark-theme .navbar .nav-link {
+            color: #e2e8f0;
+        }
+        body.dark-theme .navbar .nav-link:hover,
+        body.dark-theme .navbar .nav-link:focus {
+            color: #38bdf8;
+        }
         .hero {
             position: relative;
             overflow: hidden;
             background: linear-gradient(135deg, rgba(14, 165, 233, 0.12), rgba(59, 130, 246, 0.08));
             padding: 7rem 0 5rem;
+        }
+        body.dark-theme .hero {
+            background: linear-gradient(135deg, rgba(30, 64, 175, 0.35), rgba(8, 145, 178, 0.15));
+            color: #f8fafc;
         }
         .hero::before,
         .hero::after {
@@ -192,8 +221,15 @@ $structuredData = buildStructuredData($business);
             font-weight: 600;
             margin-bottom: 1.5rem;
         }
+        body.dark-theme .hero-badge {
+            background: rgba(125, 211, 252, 0.18);
+            color: #bae6fd;
+        }
         .hero p.lead {
             color: #4b5563;
+        }
+        body.dark-theme .hero p.lead {
+            color: #cbd5f5;
         }
         .hero-actions {
             display: flex;
@@ -220,6 +256,11 @@ $structuredData = buildStructuredData($business);
             align-items: center;
             gap: 0.75rem;
         }
+        body.dark-theme .hero-meta-card {
+            background-color: #111827;
+            box-shadow: 0 16px 30px rgba(15, 23, 42, 0.5);
+            color: #e2e8f0;
+        }
         .hero-meta-icon {
             width: 44px;
             height: 44px;
@@ -230,6 +271,10 @@ $structuredData = buildStructuredData($business);
             justify-content: center;
             color: #2563eb;
             font-size: 1.25rem;
+        }
+        body.dark-theme .hero-meta-icon {
+            background: linear-gradient(135deg, rgba(56, 189, 248, 0.18), rgba(14, 165, 233, 0.12));
+            color: #38bdf8;
         }
         .hero-meta-card strong {
             font-size: 1.1rem;
@@ -243,11 +288,18 @@ $structuredData = buildStructuredData($business);
             min-height: 420px;
             overflow: hidden;
         }
+        body.dark-theme .hero-illustration {
+            background: linear-gradient(180deg, #0f172a 10%, #1e293b 100%);
+            box-shadow: 0 32px 70px rgba(15, 23, 42, 0.6);
+        }
         .hero-circle {
             position: absolute;
             inset: 15% 20% 15% 20%;
             border-radius: 40%;
             background: radial-gradient(circle at top, rgba(59, 130, 246, 0.15), transparent 70%);
+        }
+        body.dark-theme .hero-circle {
+            background: radial-gradient(circle at top, rgba(56, 189, 248, 0.2), transparent 70%);
         }
         .hero-avatar {
             position: relative;
@@ -275,8 +327,16 @@ $structuredData = buildStructuredData($business);
             font-weight: 600;
             color: #1f2937;
         }
+        body.dark-theme .floating-card {
+            background: #111827;
+            color: #f1f5f9;
+            box-shadow: 0 24px 50px rgba(15, 23, 42, 0.5);
+        }
         .floating-card i {
             color: #0ea5e9;
+        }
+        body.dark-theme .floating-card i {
+            color: #38bdf8;
         }
         .floating-card.top {
             top: 28px;
@@ -297,6 +357,10 @@ $structuredData = buildStructuredData($business);
             transition: transform 0.2s ease, box-shadow 0.2s ease;
             height: 100%;
         }
+        body.dark-theme .category-card {
+            background-color: #111827;
+            box-shadow: 0 18px 40px rgba(15, 23, 42, 0.5);
+        }
         .category-card:hover {
             transform: translateY(-6px);
             box-shadow: 0 24px 50px rgba(37, 99, 235, 0.18);
@@ -313,10 +377,17 @@ $structuredData = buildStructuredData($business);
             color: #1d4ed8;
             margin-bottom: 1rem;
         }
+        body.dark-theme .category-icon {
+            background: linear-gradient(135deg, rgba(56, 189, 248, 0.2), rgba(14, 165, 233, 0.18));
+            color: #38bdf8;
+        }
         .section-title {
             font-size: 1.75rem;
             font-weight: 700;
             margin-bottom: 1.5rem;
+        }
+        body.dark-theme .section-title {
+            color: #f8fafc;
         }
         .service-card {
             border-radius: 1.25rem;
@@ -324,6 +395,11 @@ $structuredData = buildStructuredData($business);
             transition: transform 0.2s ease, box-shadow 0.2s ease;
             height: 100%;
             border: 1px solid rgba(37, 99, 235, 0.08);
+        }
+        body.dark-theme .service-card {
+            background-color: #111827;
+            border-color: rgba(56, 189, 248, 0.15);
+            box-shadow: 0 14px 32px rgba(15, 23, 42, 0.5);
         }
         .service-card:hover {
             transform: translateY(-6px);
@@ -352,6 +428,11 @@ $structuredData = buildStructuredData($business);
             padding: 2rem;
             height: 100%;
         }
+        body.dark-theme .testimonial {
+            background-color: #111827;
+            box-shadow: 0 18px 40px rgba(15, 23, 42, 0.5);
+            color: #e2e8f0;
+        }
         .monogram {
             width: 52px;
             height: 52px;
@@ -363,6 +444,34 @@ $structuredData = buildStructuredData($business);
             color: #ffffff;
             font-weight: 700;
             font-size: 1.5rem;
+        }
+        body.dark-theme .monogram {
+            background: linear-gradient(135deg, #1e3a8a, #0284c7);
+        }
+        body.dark-theme .bg-white {
+            background-color: #111827 !important;
+        }
+        body.dark-theme .bg-light {
+            background-color: #0b1220 !important;
+        }
+        body.dark-theme .text-dark {
+            color: #e2e8f0 !important;
+        }
+        body.dark-theme .btn-primary {
+            color: #0f172a;
+        }
+        body.dark-theme .btn-outline-secondary {
+            color: #e2e8f0;
+            border-color: rgba(226, 232, 240, 0.4);
+        }
+        body.dark-theme .btn-outline-secondary:hover {
+            background-color: rgba(226, 232, 240, 0.1);
+        }
+        .btn-toggle-icon {
+            transition: transform 0.2s ease;
+        }
+        #theme-toggle[aria-pressed="true"] .btn-toggle-icon {
+            transform: rotate(-20deg);
         }
         footer {
             background-color: #0f172a;
@@ -415,9 +524,8 @@ $structuredData = buildStructuredData($business);
                 <li class="nav-item"><a class="nav-link" href="#gallery">نمونه‌کارها</a></li>
                 <li class="nav-item"><a class="nav-link" href="#reviews">نظرات</a></li>
                 <li class="nav-item"><a class="nav-link" href="#contact">تماس</a></li>
-                <li class="nav-item"><a class="nav-link" href="#map">مسیر</a></li>
             </ul>
-            <a class="btn btn-primary rounded-pill ms-lg-3" href="<?= htmlspecialchars($business['bookingUrl'], ENT_QUOTES, 'UTF-8'); ?>" target="_blank" rel="noopener">رزرو آنلاین</a>
+            <a class="btn btn-primary rounded-pill ms-lg-3" href="<?= htmlspecialchars($business['bookingUrl'], ENT_QUOTES, 'UTF-8'); ?>" <?= $bookingLinkIsTel ? '' : 'target="_blank" rel="noopener"'; ?>>رزرو آنلاین</a>
         </div>
     </div>
 </nav>
@@ -430,10 +538,10 @@ $structuredData = buildStructuredData($business);
                 <h1 class="display-5 mb-3">تحول لبخند با دقت و آرامش در کلینیک الَنزا</h1>
                 <p class="lead mb-4">از معاینه‌های دوره‌ای تا درمان‌های زیبایی پیشرفته، تیم متخصص الَنزا در کنار خانوادهٔ شماست تا لبخندی سالم و درخشان بسازید.</p>
                 <div class="hero-actions">
-                    <a class="btn btn-primary btn-lg" href="<?= htmlspecialchars($business['bookingUrl'], ENT_QUOTES, 'UTF-8'); ?>" target="_blank" rel="noopener">
+                    <a class="btn btn-primary btn-lg" href="<?= htmlspecialchars($business['bookingUrl'], ENT_QUOTES, 'UTF-8'); ?>" <?= $bookingLinkIsTel ? '' : 'target="_blank" rel="noopener"'; ?>>
                         <i class="fa-solid fa-calendar-check ms-2"></i> رزرو وقت آنلاین
                     </a>
-                    <a class="btn btn-outline-primary btn-lg" href="tel:<?= htmlspecialchars(preg_replace('/\s+/', '', $business['phone']), ENT_QUOTES, 'UTF-8'); ?>">
+                    <a class="btn btn-outline-primary btn-lg" href="<?= htmlspecialchars($callLink, ENT_QUOTES, 'UTF-8'); ?>">
                         <i class="fa-solid fa-phone ms-2"></i> مشاوره فوری
                     </a>
                 </div>
@@ -624,7 +732,9 @@ $structuredData = buildStructuredData($business);
                 <div class="contact-card p-4 bg-white">
                     <h3 class="h5 mb-3"><i class="fa-solid fa-info-circle ms-2 text-primary"></i>راه‌های ارتباطی</h3>
                     <p class="mb-2"><i class="fa-solid fa-location-dot text-danger ms-2"></i><?= htmlspecialchars(formatAddress($business['address']), ENT_QUOTES, 'UTF-8'); ?></p>
-                    <p class="mb-0"><i class="fa-solid fa-phone text-success ms-2"></i><a href="tel:<?= htmlspecialchars(preg_replace('/\s+/', '', $business['phone']), ENT_QUOTES, 'UTF-8'); ?>" class="link-dark text-decoration-none"><?= htmlspecialchars(formatPhoneDisplay($business['phone']), ENT_QUOTES, 'UTF-8'); ?></a></p>
+                    <p class="mb-2"><i class="fa-solid fa-phone text-success ms-2"></i><a href="<?= htmlspecialchars($callLink, ENT_QUOTES, 'UTF-8'); ?>" class="link-dark text-decoration-none"><?= htmlspecialchars($business['phone'], ENT_QUOTES, 'UTF-8'); ?></a></p>
+                    <p class="mb-2"><i class="fa-solid fa-envelope text-warning ms-2"></i><a href="mailto:<?= htmlspecialchars($business['email'], ENT_QUOTES, 'UTF-8'); ?>" class="link-dark text-decoration-none"><?= htmlspecialchars($business['email'], ENT_QUOTES, 'UTF-8'); ?></a></p>
+                    <p class="mb-0"><i class="fa-solid fa-earth-americas text-info ms-2"></i><a href="<?= htmlspecialchars($business['website'], ENT_QUOTES, 'UTF-8'); ?>" class="link-dark text-decoration-none" target="_blank" rel="noopener">وب‌سایت</a></p>
                 </div>
             </div>
             <div class="col-lg-6">
@@ -670,33 +780,97 @@ $structuredData = buildStructuredData($business);
     </div>
 </section>
 
-<section id="map" class="py-5 bg-light">
-    <div class="container">
-        <h2 class="section-title text-center">مسیر دسترسی</h2>
-        <div class="ratio ratio-16x9 shadow rounded-4 overflow-hidden">
-            <?php if (!empty($business['mapEmbed'])): ?>
-                <iframe src="<?= htmlspecialchars($business['mapEmbed'], ENT_QUOTES, 'UTF-8'); ?>" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
-            <?php else: ?>
-                <iframe src="https://www.google.com/maps?q=<?= htmlspecialchars((string) $business['coordinates']['lat'], ENT_QUOTES, 'UTF-8'); ?>,<?= htmlspecialchars((string) $business['coordinates']['lng'], ENT_QUOTES, 'UTF-8'); ?>&hl=fa&z=16&output=embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
-            <?php endif; ?>
-        </div>
-    </div>
-</section>
-
 <footer class="py-4">
     <div class="container text-center">
         <div class="mb-2">
             <a href="<?= htmlspecialchars($business['googleUrl'], ENT_QUOTES, 'UTF-8'); ?>" target="_blank" rel="noopener" class="btn btn-outline-light btn-sm rounded-pill"><i class="fa-brands fa-google ms-1"></i>صفحهٔ گوگل</a>
-            <a href="<?= htmlspecialchars($business['bookingUrl'], ENT_QUOTES, 'UTF-8'); ?>" target="_blank" rel="noopener" class="btn btn-primary btn-sm rounded-pill ms-2">رزرو آنلاین</a>
+            <a href="<?= htmlspecialchars($business['bookingUrl'], ENT_QUOTES, 'UTF-8'); ?>" <?= $bookingLinkIsTel ? '' : 'target="_blank" rel="noopener"'; ?> class="btn btn-primary btn-sm rounded-pill ms-2">رزرو آنلاین</a>
         </div>
         <p class="mb-0">© <?= date('Y'); ?> <?= htmlspecialchars($business['name'], ENT_QUOTES, 'UTF-8'); ?> - تمامی حقوق محفوظ است.</p>
     </div>
 </footer>
 
+<script>
+    (function () {
+        const body = document.body;
+        const toggleButton = document.getElementById('theme-toggle');
+        if (!toggleButton) {
+            return;
+        }
+        const label = document.getElementById('theme-toggle-label');
+        const icon = toggleButton.querySelector('.btn-toggle-icon');
+        const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+        const applyTheme = (mode) => {
+            const isDark = mode === 'dark';
+            body.classList.toggle('dark-theme', isDark);
+            toggleButton.setAttribute('aria-pressed', isDark ? 'true' : 'false');
+            if (icon) {
+                icon.classList.toggle('fa-moon', !isDark);
+                icon.classList.toggle('fa-sun', isDark);
+            }
+            if (label) {
+                label.textContent = isDark ? 'حالت روز' : 'حالت شب';
+            }
+        };
+
+        const savedTheme = localStorage.getItem('theme-mode');
+        applyTheme(savedTheme ? savedTheme : (prefersDark ? 'dark' : 'light'));
+
+        toggleButton.addEventListener('click', () => {
+            const isCurrentlyDark = body.classList.contains('dark-theme');
+            const nextTheme = isCurrentlyDark ? 'light' : 'dark';
+            applyTheme(nextTheme);
+            try {
+                localStorage.setItem('theme-mode', nextTheme);
+            } catch (err) {
+                console.warn('Cannot persist theme preference', err);
+            }
+        });
+    })();
+</script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
 </body>
 </html>
 <?php
+function buildTelLink(?string $phone): string
+{
+    $phone = trim((string) $phone);
+    if ($phone === '') {
+        return '#';
+    }
+
+    if (str_starts_with($phone, 'tel:')) {
+        $phone = substr($phone, 4) ?: '';
+    }
+
+    $hasPlus = str_starts_with($phone, '+');
+    $digits = preg_replace('/\D+/u', '', $phone);
+    if (!is_string($digits) || $digits === '') {
+        return '#';
+    }
+
+    if ($hasPlus) {
+        $digits = '+' . ltrim($digits, '+');
+    }
+
+    return 'tel:' . $digits;
+}
+
+function buildBookingLink(?string $bookingUrl, ?string $phone): string
+{
+    $bookingUrl = trim((string) $bookingUrl);
+    if ($bookingUrl !== '') {
+        if (str_starts_with($bookingUrl, 'tel:')) {
+            return buildTelLink(substr($bookingUrl, 4) ?: '');
+        }
+
+        return $bookingUrl;
+    }
+
+    return buildTelLink($phone);
+}
+
 function fetchGooglePlaceDetails(string $apiKey, string $placeId, int $cacheTtl): ?array
 {
     if ($apiKey === '' || $placeId === '') {
@@ -879,7 +1053,7 @@ function getDefaultServices(): array
         [
             'title' => 'زیبایی و اصلاح طرح لبخند',
             'description' => 'تکنیک‌های تخصصی برای درخشندگی و هماهنگی لبخند.',
-            'icon' => 'fa-solid fa-sparkles',
+            'icon' => 'fa-solid fa-wand-magic-sparkles',
             'items' => [
                 'کامپوزیت و ونیر کامپوزیت',
                 'لیفت لثه',
