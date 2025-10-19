@@ -1250,19 +1250,49 @@ function renderStars(float $rating): string
 
 function formatAddress(array $address): string
 {
-    if (!empty($address['formatted'])) {
-        return $address['formatted'];
+    $formatted = '';
+
+    if (!empty($address['formatted']) && !containsLatinLetters($address['formatted'])) {
+        $formatted = $address['formatted'];
+    } else {
+        $parts = array_filter([
+            $address['street'] ?? '',
+            $address['city'] ?? '',
+            $address['province'] ?? '',
+            $address['postalCode'] ?? '',
+            $address['country'] ?? '',
+        ]);
+        $formatted = implode('، ', $parts);
+
+        if ($formatted === '' && !empty($address['formatted'])) {
+            $formatted = $address['formatted'];
+        }
     }
 
-    $parts = array_filter([
-        $address['street'] ?? '',
-        $address['city'] ?? '',
-        $address['province'] ?? '',
-        $address['postalCode'] ?? '',
-        $address['country'] ?? '',
-    ]);
+    return convertToPersianDigits($formatted);
+}
 
-    return implode('، ', $parts);
+function formatPhoneDisplay(string $phone): string
+{
+    $trimmed = trim($phone);
+    if ($trimmed === '') {
+        return '';
+    }
+
+    return convertToPersianDigits($trimmed);
+}
+
+function containsLatinLetters(string $text): bool
+{
+    return preg_match('/[A-Za-z]/u', $text) === 1;
+}
+
+function convertToPersianDigits(string $value): string
+{
+    $westernDigits = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+    $persianDigits = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
+
+    return str_replace($westernDigits, $persianDigits, $value);
 }
 
 function getMonogramLetter(string $text): string
