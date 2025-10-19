@@ -1,0 +1,10 @@
+{
+  "name": "elanza-dental-clinic",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Landing page for Elanza Dental Clinic with RTL Bootstrap and Google Places integration",
+  "scripts": {
+    "start": "php -S localhost:8000",
+    "lint": "php -l index.php"
+  }
+}
