@@ -1,0 +1,5 @@
+# Ignore cached API responses while keeping the directory
+*.json
+!google_place.json
+*.tmp
+*.cache

@@ -1,0 +1,14 @@
+{
+    "name": "elanza/clinic-website",
+    "description": "وب‌سایت تک‌صفحه‌ای کلینیک دندانپزشکی الَنزا با پشتیبانی از Google Places API",
+    "type": "project",
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "": "src/"
+        }
+    },
+    "scripts": {
+        "serve": "php -S localhost:8000"
+    }
+}
