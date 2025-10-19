@@ -418,36 +418,6 @@ $structuredData = buildStructuredData($business);
                         <i class="fa-solid fa-phone ms-2"></i> مشاوره فوری
                     </a>
                 </div>
-                <div class="hero-meta">
-                    <div class="hero-meta-card">
-                        <span class="hero-meta-icon"><i class="fa-solid fa-star"></i></span>
-                        <div>
-                            <strong><?= htmlspecialchars(number_format((float) $business['rating'], 1), ENT_QUOTES, 'UTF-8'); ?>/۵</strong>
-                            <div class="text-muted small">امتیاز کاربران</div>
-                        </div>
-                    </div>
-                    <div class="hero-meta-card">
-                        <span class="hero-meta-icon"><i class="fa-solid fa-face-smile"></i></span>
-                        <div>
-                            <strong><?= htmlspecialchars(number_format(max((int) $business['reviewCount'], 120)), ENT_QUOTES, 'UTF-8'); ?>+</strong>
-                            <div class="text-muted small">نظرات ثبت‌شده</div>
-                        </div>
-                    </div>
-                    <div class="hero-meta-card">
-                        <span class="hero-meta-icon"><i class="fa-solid fa-stethoscope"></i></span>
-                        <div>
-                            <strong><?= htmlspecialchars((string) max(count($business['services']), 6), ENT_QUOTES, 'UTF-8'); ?>+</strong>
-                            <div class="text-muted small">خدمات تخصصی</div>
-                        </div>
-                    </div>
-                    <div class="hero-meta-card">
-                        <span class="hero-meta-icon"><i class="fa-solid fa-location-dot"></i></span>
-                        <div>
-                            <strong><?= htmlspecialchars($business['address']['city'] ?? 'تهران', ENT_QUOTES, 'UTF-8'); ?></strong>
-                            <div class="text-muted small">دسترسی آسان</div>
-                        </div>
-                    </div>
-                </div>
             </div>
             <div class="col-lg-6">
                 <div class="hero-illustration">
