@@ -1,0 +1,47 @@
+{
+  "name": "Elanza Dental",
+  "rating": 4.8,
+  "user_ratings_total": 26,
+  "formatted_address": "Kermanshah Province, Kermanshah, Azadi Blvd, Iran",
+  "international_phone_number": "+98 930 595 8954",
+  "website": "https://dr-mohammad.setaei.com/Elanza-main/",
+  "geometry": {
+    "location": {
+      "lat": 34.3276,
+      "lng": 47.0779
+    }
+  },
+  "url": "https://www.google.com/maps/search/?api=1&query=Elanza+Dental",
+  "opening_hours": {
+    "weekday_text": [
+      "شنبه: ۰۹:۳۰–۱۸:۳۰",
+      "یکشنبه: ۰۹:۳۰–۱۸:۳۰",
+      "دوشنبه: ۰۹:۳۰–۱۸:۳۰",
+      "سه‌شنبه: ۰۹:۳۰–۱۸:۳۰",
+      "چهارشنبه: ۰۹:۳۰–۱۸:۳۰",
+      "پنجشنبه: ۰۹:۳۰–۱۴:۰۰",
+      "جمعه: تعطیل"
+    ]
+  },
+  "reviews": [
+    {
+      "author_name": "Parisa Hosseini",
+      "rating": 5,
+      "text": "تیم الَنزا بسیار حرفه‌ای هستند و تمام مراحل درمان را با حوصله توضیح می‌دهند.",
+      "relative_time_description": "یک ماه پیش"
+    },
+    {
+      "author_name": "Saeid Rahmani",
+      "rating": 5,
+      "text": "از نتیجه سفید کردن دندان‌ها خیلی راضی هستم. محیط کاملاً استریل و آرام بود.",
+      "relative_time_description": "۲ ماه پیش"
+    },
+    {
+      "author_name": "Narges Farhadi",
+      "rating": 4,
+      "text": "وقت‌ دهی دقیق بود و تیم متخصص رفتار محترمانه‌ای داشتند.",
+      "relative_time_description": "۳ ماه پیش"
+    }
+  ],
+  "photos": []
+}
