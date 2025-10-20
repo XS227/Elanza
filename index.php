@@ -728,7 +728,6 @@ $structuredData = buildStructuredData($business);
                     <h3 class="h5 mb-3"><i class="fa-solid fa-info-circle ms-2 text-primary"></i>راه‌های ارتباطی</h3>
                     <p class="mb-2"><i class="fa-solid fa-location-dot text-danger ms-2"></i><?= htmlspecialchars(formatAddress($business['address']), ENT_QUOTES, 'UTF-8'); ?></p>
                     <p class="mb-2"><i class="fa-solid fa-phone text-success ms-2"></i><a href="<?= htmlspecialchars($callLink, ENT_QUOTES, 'UTF-8'); ?>" class="link-dark text-decoration-none"><?= htmlspecialchars($business['phone'], ENT_QUOTES, 'UTF-8'); ?></a></p>
-                    <p class="mb-0"><i class="fa-solid fa-earth-americas text-info ms-2"></i><a href="<?= htmlspecialchars($business['website'], ENT_QUOTES, 'UTF-8'); ?>" class="link-dark text-decoration-none" target="_blank" rel="noopener">وب‌سایت</a></p>
                 </div>
             </div>
             <div class="col-lg-6">
