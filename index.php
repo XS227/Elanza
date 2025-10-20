@@ -607,7 +607,7 @@ $structuredData = buildStructuredData($business);
             </div>
             <div class="col-lg-6">
                 <div class="ratio ratio-16x9 rounded-4 shadow overflow-hidden">
-                    <iframe src="https://www.youtube-nocookie.com/embed/ck4cWHu3Xl0" title="Tour" allowfullscreen loading="lazy"></iframe>
+                    <iframe src="https://www.youtube-nocookie.com/embed/URaaGnH5pq0" title="Tour" allowfullscreen loading="lazy"></iframe>
                 </div>
             </div>
         </div>
