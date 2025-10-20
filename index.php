@@ -60,10 +60,10 @@ $businessDefaults = [
     'website' => getenv('BUSINESS_WEBSITE') ?: 'https://elanza.example.com',
     'googleUrl' => getBusinessGoogleUrl(),
     'address' => [
-        'street' => getenv('BUSINESS_STREET') ?: 'تهران، خیابان مثال، پلاک ۱۰',
-        'city' => getenv('BUSINESS_CITY') ?: 'تهران',
-        'province' => getenv('BUSINESS_PROVINCE') ?: 'تهران',
-        'postalCode' => getenv('BUSINESS_POSTAL_CODE') ?: '1234567890',
+        'street' => getenv('BUSINESS_STREET') ?: 'بلوار شهید شکری، 932P+CXW',
+        'city' => getenv('BUSINESS_CITY') ?: 'کرمانشاه',
+        'province' => getenv('BUSINESS_PROVINCE') ?: 'استان کرمانشاه',
+        'postalCode' => getenv('BUSINESS_POSTAL_CODE') ?: '',
         'country' => getenv('BUSINESS_COUNTRY') ?: 'ایران',
     ],
     'coordinates' => [
@@ -123,6 +123,12 @@ $structuredData = buildStructuredData($business);
             font-family: 'Vazirmatn', sans-serif;
             background-color: #f4f7ff;
             scroll-behavior: smooth;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        main {
+            flex: 1 0 auto;
         }
         body.dark-theme {
             background-color: #0f172a;
@@ -468,6 +474,7 @@ $structuredData = buildStructuredData($business);
         footer {
             background-color: #0f172a;
             color: #e2e8f0;
+            margin-top: auto;
         }
         footer a {
             color: inherit;
@@ -525,6 +532,7 @@ $structuredData = buildStructuredData($business);
     </div>
 </nav>
 
+<main>
 <header id="hero" class="hero text-dark">
     <div class="container position-relative">
         <div class="row align-items-center">
@@ -726,7 +734,6 @@ $structuredData = buildStructuredData($business);
                 </div>
                 <div class="contact-card p-4 bg-white">
                     <h3 class="h5 mb-3"><i class="fa-solid fa-info-circle ms-2 text-primary"></i>راه‌های ارتباطی</h3>
-                    <p class="mb-2"><i class="fa-solid fa-location-dot text-danger ms-2"></i><?= htmlspecialchars(formatAddress($business['address']), ENT_QUOTES, 'UTF-8'); ?></p>
                     <p class="mb-2"><i class="fa-solid fa-phone text-success ms-2"></i><a href="<?= htmlspecialchars($callLink, ENT_QUOTES, 'UTF-8'); ?>" class="link-dark text-decoration-none"><?= htmlspecialchars($business['phone'], ENT_QUOTES, 'UTF-8'); ?></a></p>
                     <p class="mb-0"><i class="fa-solid fa-earth-americas text-info ms-2"></i><a href="<?= htmlspecialchars($business['website'], ENT_QUOTES, 'UTF-8'); ?>" class="link-dark text-decoration-none" target="_blank" rel="noopener">وب‌سایت</a></p>
                 </div>
@@ -786,10 +793,15 @@ $structuredData = buildStructuredData($business);
         </div>
     </div>
 </section>
+</main>
 
 <footer class="py-4">
     <div class="container text-center">
-        <div class="mb-2">
+        <p class="mb-3">
+            <i class="fa-solid fa-location-dot text-danger ms-2"></i>
+            <?= htmlspecialchars(formatAddress($business['address']), ENT_QUOTES, 'UTF-8'); ?>
+        </p>
+        <div class="mb-3">
             <a href="<?= htmlspecialchars($business['googleUrl'], ENT_QUOTES, 'UTF-8'); ?>" target="_blank" rel="noopener" class="btn btn-outline-light btn-sm rounded-pill"><i class="fa-brands fa-google ms-1"></i>صفحهٔ گوگل</a>
             <a href="<?= htmlspecialchars($callLink, ENT_QUOTES, 'UTF-8'); ?>" class="btn btn-primary btn-sm rounded-pill ms-2"><i class="fa-solid fa-phone-volume ms-1"></i>تماس تلفنی</a>
         </div>
