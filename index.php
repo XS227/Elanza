@@ -5,7 +5,6 @@ mb_internal_encoding('UTF-8');
 
 const CACHE_DIRECTORY = __DIR__ . '/storage/cache';
 const CACHE_FILE = CACHE_DIRECTORY . '/google_place.json';
-const MESSAGE_DIRECTORY = __DIR__ . '/storage/messages';
 
 function getBusinessGoogleUrl(): string
 {
@@ -52,9 +51,6 @@ loadEnv(__DIR__ . '/.env');
 if (!is_dir(CACHE_DIRECTORY)) {
     mkdir(CACHE_DIRECTORY, 0775, true);
 }
-if (!is_dir(MESSAGE_DIRECTORY)) {
-    mkdir(MESSAGE_DIRECTORY, 0775, true);
-}
 
 $businessDefaults = [
     'name' => getenv('BUSINESS_NAME') ?: 'کلینیک دندانپزشکی الَنزا',
@@ -74,7 +70,6 @@ $businessDefaults = [
         'lat' => (float) (getenv('BUSINESS_LATITUDE') ?: '35.715298'),
         'lng' => (float) (getenv('BUSINESS_LONGITUDE') ?: '51.404343'),
     ],
-    'bookingUrl' => getenv('BOOKING_URL') ?: '',
     'mapEmbed' => getenv('CONTACT_MAP_EMBED') ?: '',
 ];
 
@@ -86,11 +81,7 @@ $placeDetails = fetchGooglePlaceDetails($placesApiKey, $placeId, $cacheTtl);
 
 $business = enrichBusinessData($businessDefaults, $placeDetails, $placesApiKey);
 $business['map'] = buildMapInfo($business, $placeId);
-$business['bookingUrl'] = buildBookingLink($business['bookingUrl'] ?? '', $business['phone'] ?? '');
-$bookingLinkIsTel = str_starts_with($business['bookingUrl'], 'tel:');
 $callLink = buildTelLink($business['phone'] ?? '');
-
-[$formStatus, $formErrors] = handleContactForm($business['email']);
 
 $primaryGalleryImage = firstGalleryImageUrl($business['gallery']['images'] ?? []);
 $metaImage = $primaryGalleryImage ?? 'https://via.placeholder.com/1200x630.png?text=Elanza+Dental';
@@ -526,7 +517,10 @@ $structuredData = buildStructuredData($business);
                 <li class="nav-item"><a class="nav-link" href="#reviews">نظرات</a></li>
                 <li class="nav-item"><a class="nav-link" href="#contact">تماس</a></li>
             </ul>
-            <a class="btn btn-primary rounded-pill ms-lg-3" href="<?= htmlspecialchars($business['bookingUrl'], ENT_QUOTES, 'UTF-8'); ?>" <?= $bookingLinkIsTel ? '' : 'target="_blank" rel="noopener"'; ?>>رزرو آنلاین</a>
+            <a class="btn btn-primary rounded-pill ms-lg-3" href="<?= htmlspecialchars($callLink, ENT_QUOTES, 'UTF-8'); ?>">
+                <i class="fa-solid fa-phone-volume ms-2"></i>
+                تماس تلفنی
+            </a>
         </div>
     </div>
 </nav>
@@ -539,11 +533,11 @@ $structuredData = buildStructuredData($business);
                 <h1 class="display-5 mb-3">تحول لبخند با دقت و آرامش در کلینیک الَنزا</h1>
                 <p class="lead mb-4">از معاینه‌های دوره‌ای تا درمان‌های زیبایی پیشرفته، تیم متخصص الَنزا در کنار خانوادهٔ شماست تا لبخندی سالم و درخشان بسازید.</p>
                 <div class="hero-actions">
-                    <a class="btn btn-primary btn-lg" href="<?= htmlspecialchars($business['bookingUrl'], ENT_QUOTES, 'UTF-8'); ?>" <?= $bookingLinkIsTel ? '' : 'target="_blank" rel="noopener"'; ?>>
-                        <i class="fa-solid fa-calendar-check ms-2"></i> رزرو وقت آنلاین
+                    <a class="btn btn-primary btn-lg" href="<?= htmlspecialchars($callLink, ENT_QUOTES, 'UTF-8'); ?>">
+                        <i class="fa-solid fa-phone-volume ms-2"></i> تماس فوری با کلینیک
                     </a>
-                    <a class="btn btn-outline-primary btn-lg" href="<?= htmlspecialchars($callLink, ENT_QUOTES, 'UTF-8'); ?>">
-                        <i class="fa-solid fa-phone ms-2"></i> مشاوره فوری
+                    <a class="btn btn-outline-primary btn-lg" href="#contact">
+                        <i class="fa-solid fa-circle-info ms-2"></i> مشاهدهٔ اطلاعات تماس
                     </a>
                 </div>
             </div>
@@ -776,42 +770,17 @@ $structuredData = buildStructuredData($business);
         </div>
         <div class="row g-4 justify-content-center">
             <div class="col-lg-8 col-xl-6">
-                <div class="contact-card p-4 bg-white">
-                    <h2 class="h5 mb-3">فرم تماس مستقیم</h2>
-                    <?php if ($formStatus === 'success'): ?>
-                        <div class="alert alert-success" role="alert">پیام شما با موفقیت ارسال شد. از تماس شما سپاسگزاریم.</div>
-                    <?php elseif ($formStatus === 'stored'): ?>
-                        <div class="alert alert-warning" role="alert">پیام شما ثبت شد اما ارسال ایمیل امکان‌پذیر نبود. لطفاً بعداً دوباره تلاش کنید.</div>
-                    <?php endif; ?>
-                    <?php if (!empty($formErrors)): ?>
-                        <div class="alert alert-danger" role="alert">
-                            <ul class="mb-0">
-                                <?php foreach ($formErrors as $error): ?>
-                                    <li><?= htmlspecialchars($error, ENT_QUOTES, 'UTF-8'); ?></li>
-                                <?php endforeach; ?>
-                            </ul>
-                        </div>
-                    <?php endif; ?>
-                    <form method="post">
-                        <input type="hidden" name="contact_form" value="1">
-                        <div class="mb-3">
-                            <label for="name" class="form-label">نام و نام خانوادگی</label>
-                            <input type="text" class="form-control" id="name" name="name" value="<?= htmlspecialchars($_POST['name'] ?? '', ENT_QUOTES, 'UTF-8'); ?>" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="email" class="form-label">ایمیل</label>
-                            <input type="email" class="form-control" id="email" name="email" value="<?= htmlspecialchars($_POST['email'] ?? '', ENT_QUOTES, 'UTF-8'); ?>" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="phone" class="form-label">شماره تماس</label>
-                            <input type="tel" class="form-control" id="phone" name="phone" value="<?= htmlspecialchars($_POST['phone'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
-                        </div>
-                        <div class="mb-3">
-                            <label for="message" class="form-label">پیام شما</label>
-                            <textarea class="form-control" id="message" name="message" rows="5" required><?= htmlspecialchars($_POST['message'] ?? '', ENT_QUOTES, 'UTF-8'); ?></textarea>
-                        </div>
-                        <button type="submit" class="btn btn-primary rounded-pill w-100">ارسال پیام</button>
-                    </form>
+                <div class="contact-card p-4 bg-white text-center">
+                    <h2 class="h5 mb-3">هماهنگی و نوبت‌دهی تلفنی</h2>
+                    <p class="text-muted mb-4">در حال حاضر درخواست‌های نوبت و مشاوره تنها از طریق تماس تلفنی ثبت می‌شود. همکاران ما در ساعات کاری پاسخگوی شما خواهند بود.</p>
+                    <div class="d-grid gap-2">
+                        <a class="btn btn-primary rounded-pill" href="<?= htmlspecialchars($callLink, ENT_QUOTES, 'UTF-8'); ?>">
+                            <i class="fa-solid fa-phone-volume ms-2"></i> تماس با پذیرش کلینیک
+                        </a>
+                    </div>
+                    <div class="bg-light rounded-4 p-3 mt-4 text-muted small">
+                        <i class="fa-solid fa-clock ms-2"></i>در صورت عدم پاسخگویی، لطفاً در نزدیک‌ترین زمان کاری دوباره با ما تماس بگیرید.
+                    </div>
                 </div>
             </div>
         </div>
@@ -822,7 +791,7 @@ $structuredData = buildStructuredData($business);
     <div class="container text-center">
         <div class="mb-2">
             <a href="<?= htmlspecialchars($business['googleUrl'], ENT_QUOTES, 'UTF-8'); ?>" target="_blank" rel="noopener" class="btn btn-outline-light btn-sm rounded-pill"><i class="fa-brands fa-google ms-1"></i>صفحهٔ گوگل</a>
-            <a href="<?= htmlspecialchars($business['bookingUrl'], ENT_QUOTES, 'UTF-8'); ?>" <?= $bookingLinkIsTel ? '' : 'target="_blank" rel="noopener"'; ?> class="btn btn-primary btn-sm rounded-pill ms-2">رزرو آنلاین</a>
+            <a href="<?= htmlspecialchars($callLink, ENT_QUOTES, 'UTF-8'); ?>" class="btn btn-primary btn-sm rounded-pill ms-2"><i class="fa-solid fa-phone-volume ms-1"></i>تماس تلفنی</a>
         </div>
         <p class="mb-0">© <?= date('Y'); ?> <?= htmlspecialchars($business['name'], ENT_QUOTES, 'UTF-8'); ?> - تمامی حقوق محفوظ است.</p>
     </div>
@@ -893,20 +862,6 @@ function buildTelLink(?string $phone): string
     }
 
     return 'tel:' . $digits;
-}
-
-function buildBookingLink(?string $bookingUrl, ?string $phone): string
-{
-    $bookingUrl = trim((string) $bookingUrl);
-    if ($bookingUrl !== '') {
-        if (str_starts_with($bookingUrl, 'tel:')) {
-            return buildTelLink(substr($bookingUrl, 4) ?: '');
-        }
-
-        return $bookingUrl;
-    }
-
-    return buildTelLink($phone);
 }
 
 function fetchGooglePlaceDetails(string $apiKey, string $placeId, int $cacheTtl): ?array
@@ -1432,88 +1387,6 @@ function getMonogramLetter(string $text): string
     return $letter !== '' ? $letter : '؟';
 }
 
-function handleContactForm(string $fallbackEmail): array
-{
-    $status = null;
-    $errors = [];
-
-    if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !isset($_POST['contact_form'])) {
-        return [null, $errors];
-    }
-
-    $name = trim($_POST['name'] ?? '');
-    $email = trim($_POST['email'] ?? '');
-    $phone = trim($_POST['phone'] ?? '');
-    $message = trim($_POST['message'] ?? '');
-
-    if ($name === '') {
-        $errors[] = 'لطفاً نام خود را وارد کنید.';
-    }
-    if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $errors[] = 'آدرس ایمیل معتبر نیست.';
-    }
-    if ($message === '') {
-        $errors[] = 'متن پیام نمی‌تواند خالی باشد.';
-    }
-
-    if (!empty($errors)) {
-        return [null, $errors];
-    }
-
-    $mailTo = getenv('MAIL_TO') ?: $fallbackEmail;
-    $subjectPrefix = getenv('MAIL_SUBJECT_PREFIX') ?: 'پیام جدید از وب‌سایت الَنزا';
-    $subject = $subjectPrefix . ' - ' . $name;
-    $bodyLines = [
-        'نام: ' . $name,
-        'ایمیل: ' . $email,
-        'تلفن: ' . ($phone !== '' ? $phone : '---'),
-        'پیام:',
-        $message,
-    ];
-    $body = implode("\n", $bodyLines);
-    $headers = [
-        'MIME-Version: 1.0',
-        'Content-Type: text/plain; charset=UTF-8',
-        'From: ' . ($mailTo ?: 'no-reply@example.com'),
-    ];
-    if ($email !== '') {
-        $headers[] = 'Reply-To: ' . $email;
-    }
-    $mailSent = false;
-    if ($mailTo && filter_var($mailTo, FILTER_VALIDATE_EMAIL)) {
-        $mailSent = @mail($mailTo, $subject, $body, implode("\r\n", $headers));
-    }
-
-    if ($mailSent) {
-        $_POST = [];
-        return ['success', $errors];
-    }
-
-    $filename = MESSAGE_DIRECTORY . '/contact-' . date('Ymd-His') . '-' . generateRandomToken() . '.txt';
-    file_put_contents($filename, $body);
-    $_POST = [];
-
-    return ['stored', $errors];
-}
-
-function generateRandomToken(int $bytes = 4): string
-{
-    try {
-        return bin2hex(random_bytes($bytes));
-    } catch (Throwable $e) {
-        if (function_exists('openssl_random_pseudo_bytes')) {
-            $fallback = openssl_random_pseudo_bytes($bytes);
-            if ($fallback !== false) {
-                return bin2hex($fallback);
-            }
-        }
-    }
-
-    $hash = hash('sha256', (string) microtime(true), true);
-
-    return substr(bin2hex($hash), 0, $bytes * 2);
-}
-
 function buildStructuredData(array $business): array
 {
     $openingSpecs = [];
@@ -1538,7 +1411,7 @@ function buildStructuredData(array $business): array
         ];
     }
 
-    return [
+    $data = [
         '@context' => 'https://schema.org',
         '@type' => 'Dentist',
         'name' => $business['name'],
@@ -1546,7 +1419,6 @@ function buildStructuredData(array $business): array
         'image' => galleryImageUrls($business['gallery']['images'] ?? []),
         'url' => $business['website'],
         'telephone' => $business['phone'],
-        'email' => $business['email'],
         'address' => [
             '@type' => 'PostalAddress',
             'streetAddress' => $business['address']['street'],
@@ -1568,4 +1440,10 @@ function buildStructuredData(array $business): array
         'openingHoursSpecification' => $openingSpecs,
         'sameAs' => [$business['googleUrl']],
     ];
+
+    if (!empty($business['email'])) {
+        $data['email'] = $business['email'];
+    }
+
+    return $data;
 }
