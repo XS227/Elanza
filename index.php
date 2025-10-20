@@ -55,8 +55,8 @@ if (!is_dir(CACHE_DIRECTORY)) {
 $businessDefaults = [
     'name' => getenv('BUSINESS_NAME') ?: 'کلینیک دندانپزشکی الَنزا',
     'description' => getenv('BUSINESS_DESCRIPTION') ?: 'کلینیک دندانپزشکی الَنزا با بهره‌گیری از تجهیزات پیشرفته و تیمی متخصص، خدمات جامع دندانپزشکی زیبایی و درمانی را در محیطی حرفه‌ای ارائه می‌دهد.',
-    'phone' => getenv('BUSINESS_PHONE') ?: '09925898954',
-    'email' => getenv('BUSINESS_EMAIL') ?: 'info@example.com',
+    'phone' => getenv('BUSINESS_PHONE') ?: '+989925898954',
+    'email' => getenv('BUSINESS_EMAIL') ?: '',
     'website' => getenv('BUSINESS_WEBSITE') ?: 'https://elanza.example.com',
     'googleUrl' => getBusinessGoogleUrl(),
     'address' => [
