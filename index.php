@@ -734,7 +734,6 @@ $structuredData = buildStructuredData($business);
                     <h3 class="h5 mb-3"><i class="fa-solid fa-info-circle ms-2 text-primary"></i>راه‌های ارتباطی</h3>
                     <p class="mb-2"><i class="fa-solid fa-location-dot text-danger ms-2"></i><?= htmlspecialchars(formatAddress($business['address']), ENT_QUOTES, 'UTF-8'); ?></p>
                     <p class="mb-2"><i class="fa-solid fa-phone text-success ms-2"></i><a href="<?= htmlspecialchars($callLink, ENT_QUOTES, 'UTF-8'); ?>" class="link-dark text-decoration-none"><?= htmlspecialchars($business['phone'], ENT_QUOTES, 'UTF-8'); ?></a></p>
-                    <p class="mb-2"><i class="fa-solid fa-envelope text-warning ms-2"></i><a href="mailto:<?= htmlspecialchars($business['email'], ENT_QUOTES, 'UTF-8'); ?>" class="link-dark text-decoration-none"><?= htmlspecialchars($business['email'], ENT_QUOTES, 'UTF-8'); ?></a></p>
                     <p class="mb-0"><i class="fa-solid fa-earth-americas text-info ms-2"></i><a href="<?= htmlspecialchars($business['website'], ENT_QUOTES, 'UTF-8'); ?>" class="link-dark text-decoration-none" target="_blank" rel="noopener">وب‌سایت</a></p>
                 </div>
             </div>
@@ -1070,13 +1069,52 @@ function buildGoogleUrl(string $name): string
 function normalizeOpeningHours(array $weekdayText): array
 {
     if (!empty($weekdayText)) {
-        return array_map(function ($line) {
+        $items = array_map(function ($line) {
             $parts = explode(':', $line, 2);
             return [
                 'day' => trim($parts[0] ?? ''),
                 'hours' => trim($parts[1] ?? ''),
             ];
         }, $weekdayText);
+
+        $grouped = [];
+        $currentGroup = null;
+
+        foreach ($items as $item) {
+            if ($currentGroup === null) {
+                $currentGroup = [
+                    'days' => [$item['day']],
+                    'hours' => $item['hours'],
+                ];
+                continue;
+            }
+
+            if ($currentGroup['hours'] === $item['hours']) {
+                $currentGroup['days'][] = $item['day'];
+            } else {
+                $grouped[] = $currentGroup;
+                $currentGroup = [
+                    'days' => [$item['day']],
+                    'hours' => $item['hours'],
+                ];
+            }
+        }
+
+        if ($currentGroup !== null) {
+            $grouped[] = $currentGroup;
+        }
+
+        return array_map(function ($group) {
+            $days = $group['days'];
+            $label = count($days) > 1
+                ? reset($days) . ' تا ' . end($days)
+                : ($days[0] ?? '');
+
+            return [
+                'day' => $label,
+                'hours' => $group['hours'],
+            ];
+        }, $grouped);
     }
 
     return [
