@@ -719,7 +719,7 @@ $structuredData = buildStructuredData($business);
 <section id="contact" class="py-5 bg-white">
     <div class="container">
         <div class="row g-4 align-items-stretch mb-4">
-            <div class="col-lg-6">
+            <div class="col-lg-8 col-xl-6">
                 <h2 class="section-title">اطلاعات تماس و ساعات کاری</h2>
                 <div class="contact-card p-4 bg-white mb-4">
                     <h3 class="h5 mb-3"><i class="fa-solid fa-clock ms-2 text-primary"></i>ساعات کاری</h3>
@@ -735,42 +735,6 @@ $structuredData = buildStructuredData($business);
                 <div class="contact-card p-4 bg-white">
                     <h3 class="h5 mb-3"><i class="fa-solid fa-info-circle ms-2 text-primary"></i>راه‌های ارتباطی</h3>
                     <p class="mb-2"><i class="fa-solid fa-phone text-success ms-2"></i><a href="<?= htmlspecialchars($callLink, ENT_QUOTES, 'UTF-8'); ?>" class="link-dark text-decoration-none"><?= htmlspecialchars($business['phone'], ENT_QUOTES, 'UTF-8'); ?></a></p>
-                </div>
-            </div>
-            <div class="col-lg-6">
-                <div class="contact-card p-4 bg-white h-100 d-flex flex-column">
-                    <h2 class="h5 mb-3">نقشه و مسیریابی</h2>
-                    <p class="text-muted small mb-3">موقعیت دقیق کلینیک الَنزا را بر روی نقشه ببینید و مسیر دسترسی خود را با یک کلیک محاسبه کنید.</p>
-                    <div class="ratio ratio-4x3 mb-3">
-                        <?php if (!empty($business['map']['embedUrl'])): ?>
-                            <iframe
-                                src="<?= htmlspecialchars($business['map']['embedUrl'], ENT_QUOTES, 'UTF-8'); ?>"
-                                allowfullscreen
-                                loading="lazy"
-                                referrerpolicy="no-referrer-when-downgrade"
-                                class="rounded border"
-                            ></iframe>
-                        <?php else: ?>
-                            <div class="d-flex align-items-center justify-content-center bg-light border rounded text-muted">
-                                <span>نقشهٔ این موقعیت در دسترس نیست.</span>
-                            </div>
-                        <?php endif; ?>
-                    </div>
-                    <div class="mt-auto">
-                        <div class="d-grid gap-2">
-                            <?php if (!empty($business['map']['directionsUrl'])): ?>
-                                <a class="btn btn-primary rounded-pill" href="<?= htmlspecialchars($business['map']['directionsUrl'], ENT_QUOTES, 'UTF-8'); ?>" target="_blank" rel="noopener">
-                                    مسیریابی و محاسبهٔ زمان با گوگل مپ
-                                </a>
-                            <?php endif; ?>
-                            <?php if (!empty($business['map']['viewUrl'])): ?>
-                                <a class="btn btn-outline-primary rounded-pill" href="<?= htmlspecialchars($business['map']['viewUrl'], ENT_QUOTES, 'UTF-8'); ?>" target="_blank" rel="noopener">
-                                    مشاهدهٔ نقشهٔ کامل در گوگل
-                                </a>
-                            <?php endif; ?>
-                        </div>
-                        <p class="text-muted small mt-3 mb-0 text-center">با استفاده از گزینهٔ «مسیریابی» در گوگل مپ می‌توانید فاصله و زمان تقریبی رسیدن خود را به کلینیک مشاهده کنید.</p>
-                    </div>
                 </div>
             </div>
         </div>
