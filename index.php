@@ -484,6 +484,17 @@ $structuredData = buildStructuredData($business);
             border-radius: 1rem;
             box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
         }
+        body.dark-theme .contact-card {
+            background-color: #0f172a !important;
+            color: #e2e8f0;
+            box-shadow: 0 12px 28px rgba(15, 23, 42, 0.4);
+        }
+        body.dark-theme .contact-card .text-muted {
+            color: rgba(203, 213, 225, 0.75) !important;
+        }
+        body.dark-theme .contact-card a {
+            color: #bae6fd !important;
+        }
         @media (max-width: 991.98px) {
             .hero {
                 padding: 5.5rem 0 4rem;
@@ -499,6 +510,50 @@ $structuredData = buildStructuredData($business);
             .hero-illustration {
                 margin-top: 2rem;
                 min-height: 360px;
+            }
+        }
+        @media (max-width: 575.98px) {
+            .hero {
+                text-align: center;
+                padding: 4.5rem 0 3.5rem;
+            }
+            .hero h1 {
+                font-size: clamp(1.9rem, 6vw + 1rem, 2.5rem);
+            }
+            .hero p.lead {
+                font-size: 1.05rem;
+            }
+            .hero-actions {
+                justify-content: center;
+            }
+            .hero-meta {
+                grid-template-columns: 1fr;
+            }
+            .hero-illustration {
+                margin-top: 2.5rem;
+                margin-inline: auto;
+                max-width: 320px;
+                padding: 2rem;
+            }
+            .floating-card {
+                position: relative;
+                inset: auto;
+                margin: 0.75rem auto 0;
+                width: min(100%, 280px);
+                justify-content: center;
+            }
+            .floating-card.top,
+            .floating-card.bottom {
+                top: auto;
+                bottom: auto;
+                inset-inline-start: auto;
+                inset-inline-end: auto;
+            }
+            .floating-card.top {
+                margin-top: 0;
+            }
+            .primary-categories {
+                margin-top: -1.5rem;
             }
         }
     </style>
@@ -734,7 +789,55 @@ $structuredData = buildStructuredData($business);
                 </div>
                 <div class="contact-card p-4 bg-white">
                     <h3 class="h5 mb-3"><i class="fa-solid fa-info-circle ms-2 text-primary"></i>راه‌های ارتباطی</h3>
-                    <p class="mb-2"><i class="fa-solid fa-phone text-success ms-2"></i><a href="<?= htmlspecialchars($callLink, ENT_QUOTES, 'UTF-8'); ?>" class="link-dark text-decoration-none"><?= htmlspecialchars($business['phone'], ENT_QUOTES, 'UTF-8'); ?></a></p>
+                    <?php if (!empty($business['phone'])): ?>
+                        <p class="mb-2 d-flex align-items-center gap-2 flex-wrap">
+                            <i class="fa-solid fa-phone text-success ms-2"></i>
+                            <a href="<?= htmlspecialchars($callLink, ENT_QUOTES, 'UTF-8'); ?>" class="link-dark text-decoration-none">
+                                <?= htmlspecialchars(formatPhoneDisplay($business['phone']), ENT_QUOTES, 'UTF-8'); ?>
+                            </a>
+                        </p>
+                    <?php endif; ?>
+                    <?php if (!empty($business['email'])): ?>
+                        <p class="mb-2 d-flex align-items-center gap-2 flex-wrap">
+                            <i class="fa-solid fa-envelope text-primary ms-2"></i>
+                            <a href="<?= htmlspecialchars(buildMailtoLink($business['email']), ENT_QUOTES, 'UTF-8'); ?>" class="link-dark text-decoration-none">
+                                <?= htmlspecialchars($business['email'], ENT_QUOTES, 'UTF-8'); ?>
+                            </a>
+                        </p>
+                    <?php endif; ?>
+                    <?php if (!empty($business['website'])): ?>
+                        <?php $websiteUrl = ensureAbsoluteUrl($business['website']); ?>
+                        <?php if ($websiteUrl !== ''): ?>
+                            <p class="mb-2 d-flex align-items-center gap-2 flex-wrap">
+                                <i class="fa-solid fa-globe text-info ms-2"></i>
+                                <a href="<?= htmlspecialchars($websiteUrl, ENT_QUOTES, 'UTF-8'); ?>" target="_blank" rel="noopener" class="link-dark text-decoration-none">
+                                    <?= htmlspecialchars(formatWebsiteLabel($websiteUrl), ENT_QUOTES, 'UTF-8'); ?>
+                                </a>
+                            </p>
+                        <?php endif; ?>
+                    <?php endif; ?>
+                    <?php $formattedAddress = formatAddress($business['address']); ?>
+                    <?php if ($formattedAddress !== ''): ?>
+                        <p class="mb-0 d-flex align-items-start gap-2">
+                            <i class="fa-solid fa-location-dot text-danger ms-2 mt-1"></i>
+                            <span><?= htmlspecialchars($formattedAddress, ENT_QUOTES, 'UTF-8'); ?></span>
+                        </p>
+                    <?php endif; ?>
+                    <?php $hasQuickLinks = ($callLink !== '#') || !empty($business['googleUrl']); ?>
+                    <?php if ($hasQuickLinks): ?>
+                        <div class="d-flex flex-wrap gap-2 mt-3">
+                            <?php if ($callLink !== '#'): ?>
+                                <a class="btn btn-primary btn-sm rounded-pill" href="<?= htmlspecialchars($callLink, ENT_QUOTES, 'UTF-8'); ?>">
+                                    <i class="fa-solid fa-phone-volume ms-1"></i>تماس سریع
+                                </a>
+                            <?php endif; ?>
+                            <?php if (!empty($business['googleUrl'])): ?>
+                                <a class="btn btn-outline-primary btn-sm rounded-pill" href="<?= htmlspecialchars($business['googleUrl'], ENT_QUOTES, 'UTF-8'); ?>" target="_blank" rel="noopener">
+                                    <i class="fa-brands fa-google ms-1"></i>صفحهٔ گوگل
+                                </a>
+                            <?php endif; ?>
+                        </div>
+                    <?php endif; ?>
                 </div>
             </div>
             <div class="col-lg-6">
@@ -873,6 +976,48 @@ function buildTelLink(?string $phone): string
     }
 
     return 'tel:' . $digits;
+}
+
+function buildMailtoLink(?string $email): string
+{
+    $email = trim((string) $email);
+    if ($email === '') {
+        return '#';
+    }
+
+    if (stripos($email, 'mailto:') === 0) {
+        $email = substr($email, 7) ?: '';
+    }
+
+    $email = preg_replace('/\s+/u', '', $email);
+    if ($email === '' || $email === false) {
+        return '#';
+    }
+
+    $sanitized = filter_var($email, FILTER_SANITIZE_EMAIL);
+    if (!is_string($sanitized) || $sanitized === '') {
+        return '#';
+    }
+
+    return 'mailto:' . $sanitized;
+}
+
+function ensureAbsoluteUrl(?string $url): string
+{
+    $url = trim((string) $url);
+    if ($url === '') {
+        return '';
+    }
+
+    if (preg_match('/^https?:\/\//iu', $url)) {
+        return $url;
+    }
+
+    if (str_starts_with($url, '//')) {
+        return 'https:' . $url;
+    }
+
+    return 'https://' . ltrim($url, '/');
 }
 
 function fetchGooglePlaceDetails(string $apiKey, string $placeId, int $cacheTtl): ?array
@@ -1372,6 +1517,23 @@ function formatPhoneDisplay(string $phone): string
     }
 
     return convertToPersianDigits($trimmed);
+}
+
+function formatWebsiteLabel(string $url): string
+{
+    $host = parse_url($url, PHP_URL_HOST);
+    if (is_string($host) && $host !== '') {
+        return convertToPersianDigits($host);
+    }
+
+    $clean = preg_replace('/^https?:\/\//iu', '', $url);
+    if (!is_string($clean) || $clean === '') {
+        $clean = $url;
+    }
+
+    $clean = rtrim($clean, '/');
+
+    return convertToPersianDigits($clean);
 }
 
 function containsLatinLetters(string $text): bool
