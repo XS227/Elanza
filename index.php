@@ -85,6 +85,7 @@ $cacheTtl = (int) (getenv('CACHE_TTL_SECONDS') ?: 43200); // 12 hours by default
 $placeDetails = fetchGooglePlaceDetails($placesApiKey, $placeId, $cacheTtl);
 
 $business = enrichBusinessData($businessDefaults, $placeDetails, $placesApiKey);
+$business['map'] = buildMapInfo($business, $placeId);
 $business['bookingUrl'] = buildBookingLink($business['bookingUrl'] ?? '', $business['phone'] ?? '');
 $bookingLinkIsTel = str_starts_with($business['bookingUrl'], 'tel:');
 $callLink = buildTelLink($business['phone'] ?? '');
@@ -715,7 +716,7 @@ $structuredData = buildStructuredData($business);
 
 <section id="contact" class="py-5 bg-white">
     <div class="container">
-        <div class="row g-4 align-items-start">
+        <div class="row g-4 align-items-stretch mb-4">
             <div class="col-lg-6">
                 <h2 class="section-title">اطلاعات تماس و ساعات کاری</h2>
                 <div class="contact-card p-4 bg-white mb-4">
@@ -738,6 +739,44 @@ $structuredData = buildStructuredData($business);
                 </div>
             </div>
             <div class="col-lg-6">
+                <div class="contact-card p-4 bg-white h-100 d-flex flex-column">
+                    <h2 class="h5 mb-3">نقشه و مسیریابی</h2>
+                    <p class="text-muted small mb-3">موقعیت دقیق کلینیک الَنزا را بر روی نقشه ببینید و مسیر دسترسی خود را با یک کلیک محاسبه کنید.</p>
+                    <div class="ratio ratio-4x3 mb-3">
+                        <?php if (!empty($business['map']['embedUrl'])): ?>
+                            <iframe
+                                src="<?= htmlspecialchars($business['map']['embedUrl'], ENT_QUOTES, 'UTF-8'); ?>"
+                                allowfullscreen
+                                loading="lazy"
+                                referrerpolicy="no-referrer-when-downgrade"
+                                class="rounded border"
+                            ></iframe>
+                        <?php else: ?>
+                            <div class="d-flex align-items-center justify-content-center bg-light border rounded text-muted">
+                                <span>نقشهٔ این موقعیت در دسترس نیست.</span>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                    <div class="mt-auto">
+                        <div class="d-grid gap-2">
+                            <?php if (!empty($business['map']['directionsUrl'])): ?>
+                                <a class="btn btn-primary rounded-pill" href="<?= htmlspecialchars($business['map']['directionsUrl'], ENT_QUOTES, 'UTF-8'); ?>" target="_blank" rel="noopener">
+                                    مسیریابی و محاسبهٔ زمان با گوگل مپ
+                                </a>
+                            <?php endif; ?>
+                            <?php if (!empty($business['map']['viewUrl'])): ?>
+                                <a class="btn btn-outline-primary rounded-pill" href="<?= htmlspecialchars($business['map']['viewUrl'], ENT_QUOTES, 'UTF-8'); ?>" target="_blank" rel="noopener">
+                                    مشاهدهٔ نقشهٔ کامل در گوگل
+                                </a>
+                            <?php endif; ?>
+                        </div>
+                        <p class="text-muted small mt-3 mb-0 text-center">با استفاده از گزینهٔ «مسیریابی» در گوگل مپ می‌توانید فاصله و زمان تقریبی رسیدن خود را به کلینیک مشاهده کنید.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row g-4 justify-content-center">
+            <div class="col-lg-8 col-xl-6">
                 <div class="contact-card p-4 bg-white">
                     <h2 class="h5 mb-3">فرم تماس مستقیم</h2>
                     <?php if ($formStatus === 'success'): ?>
@@ -1150,6 +1189,55 @@ function buildStreetViewGalleryItem(array $coordinates): ?array
         'type' => 'streetview',
         'embedUrl' => $embedUrl,
         'alt' => 'نمای خیابانی کلینیک الَنزا',
+    ];
+}
+
+function buildMapInfo(array $business, string $placeId): array
+{
+    $mapEmbed = trim((string) ($business['mapEmbed'] ?? ''));
+    $coordinates = $business['coordinates'] ?? [];
+    $lat = isset($coordinates['lat']) && is_numeric($coordinates['lat']) ? (float) $coordinates['lat'] : null;
+    $lng = isset($coordinates['lng']) && is_numeric($coordinates['lng']) ? (float) $coordinates['lng'] : null;
+
+    $embedUrl = '';
+    if ($mapEmbed !== '') {
+        if (filter_var($mapEmbed, FILTER_VALIDATE_URL)) {
+            $embedUrl = $mapEmbed;
+        } elseif (preg_match('/src="([^"]+)"/u', $mapEmbed, $matches)) {
+            $embedUrl = $matches[1];
+        }
+    }
+
+    if ($embedUrl === '' && $lat !== null && $lng !== null) {
+        $embedUrl = sprintf('https://www.google.com/maps?q=%1$.6f,%2$.6f&z=16&output=embed', $lat, $lng);
+    }
+
+    $directionsParams = [];
+    if ($placeId !== '') {
+        $directionsParams['destination_place_id'] = $placeId;
+    } elseif ($lat !== null && $lng !== null) {
+        $directionsParams['destination'] = sprintf('%1$.6f,%2$.6f', $lat, $lng);
+    } else {
+        $formattedAddress = formatAddress($business['address'] ?? []);
+        if ($formattedAddress !== '') {
+            $directionsParams['destination'] = $formattedAddress;
+        }
+    }
+
+    $directionsUrl = '';
+    if (!empty($directionsParams)) {
+        $directionsUrl = 'https://www.google.com/maps/dir/?api=1&' . http_build_query($directionsParams);
+    }
+
+    $viewUrl = $business['googleUrl'] ?? '';
+    if ($viewUrl === '' && $lat !== null && $lng !== null) {
+        $viewUrl = sprintf('https://www.google.com/maps/place/%1$.6f,%2$.6f', $lat, $lng);
+    }
+
+    return [
+        'embedUrl' => $embedUrl,
+        'directionsUrl' => $directionsUrl,
+        'viewUrl' => $viewUrl,
     ];
 }
 
